@@ -340,12 +340,7 @@ export default function NewSalePage() {
     <div className="p-3.5 md:p-6 max-w-4xl mx-auto space-y-5 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">Record New Sale</h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Snapshot costs, negotiated prices and payment verification
-          </div>
-        </div>
+        <h1 className="text-xl font-bold tracking-tight">New Sale</h1>
       </div>
 
       {errorMessage && (

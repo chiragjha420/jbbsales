@@ -6,13 +6,11 @@ import { useAuth } from '@/context/AuthContext';
 import { Sale, FinancialSummary } from '@/types';
 import { formatINR, formatDate } from '@/lib/calculations';
 import {
-  PlusCircle,
-  TrendingUp,
+  Plus,
   Receipt,
-  Users,
-  AlertCircle,
   CheckCircle2,
   Clock,
+  AlertCircle,
   ArrowUpRight,
   Filter,
 } from 'lucide-react';
@@ -32,7 +30,6 @@ export default function DashboardPage() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Calculate date filters
       let startDate: string | undefined;
       const now = new Date();
       if (dateRange === 'today') {
@@ -62,10 +59,12 @@ export default function DashboardPage() {
         const sumRes = await fetch(
           `/api/analytics/summary${startDate ? `?startDate=${startDate}` : ''}`
         );
-        const sumData = await sumRes.json();
-        setSummary(sumData.summary || null);
+        if (sumRes.ok) {
+          const sumData = await sumRes.json();
+          setSummary(sumData.summary || null);
+        }
       } else {
-        // Salesperson personal metrics
+        // Salesperson personal metrics strictly calculated from their own sales
         let totalRev = 0;
         let totalCost = 0;
         let totalPaid = 0;
@@ -128,26 +127,18 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-3.5 md:p-6 max-w-5xl mx-auto space-y-5 pb-20">
       {/* Top Banner & Quick Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-            {isAdmin ? 'Management Executive Overview' : `Sales Desk: ${user?.full_name || 'Rahul Sharma'}`}
-          </h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {isAdmin
-              ? 'Real-time company performance, profitability and cash collection metrics'
-              : 'Direct sales logging, negotiated pricing economics and payment proofs'}
-          </div>
-        </div>
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-border">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+          {isAdmin ? 'Dashboard' : 'Sales Desk'}
+        </h1>
 
-        {/* The most prominent action on Home must be New Sale */}
         <Link
           href="/sales/new"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-sm rounded shadow-sm transition-colors text-center"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors text-center"
         >
-          <PlusCircle className="w-4 h-4" />
+          <Plus className="w-4 h-4" />
           <span>New Sale</span>
         </Link>
       </div>
@@ -169,112 +160,100 @@ export default function DashboardPage() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {r === 'all' ? 'All Time' : r === 'today' ? 'Today' : `This ${r}`}
+              {r === 'all' ? 'All' : r === 'today' ? 'Today' : `This ${r}`}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Financial Metrics Row - Clean, Information-Dense Business Layout */}
+      {/* Financial Metrics Row */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 bg-surface animate-pulse rounded border border-border" />
+            <div key={i} className="h-16 bg-surface animate-pulse rounded border border-border" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="p-3.5 bg-surface border border-border rounded">
-            <div className="text-[11px] text-muted-foreground uppercase font-medium">Total Revenue</div>
-            <div className="text-lg md:text-xl font-bold mt-1 text-foreground">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <div className="p-3 bg-surface border border-border rounded">
+            <div className="text-[10px] text-muted-foreground uppercase font-medium">Revenue</div>
+            <div className="text-base md:text-lg font-bold mt-0.5 text-foreground">
               {formatINR(summary?.totalRevenue || 0)}
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              {summary?.salesCount || 0} orders recorded
+              {summary?.salesCount || 0} {summary?.salesCount === 1 ? 'order' : 'orders'}
             </div>
           </div>
 
-          <div className="p-3.5 bg-surface border border-border rounded">
-            <div className="text-[11px] text-muted-foreground uppercase font-medium">Gross Profit</div>
-            <div className="text-lg md:text-xl font-bold mt-1 text-success">
+          <div className="p-3 bg-surface border border-border rounded">
+            <div className="text-[10px] text-muted-foreground uppercase font-medium">Gross Profit</div>
+            <div className="text-base md:text-lg font-bold mt-0.5 text-success">
               {formatINR(summary?.totalGrossProfit || 0)}
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              Margin: <span className="font-semibold text-foreground">{(summary?.grossMargin || 0).toFixed(1)}%</span>
+              Margin: <span className="font-semibold text-foreground">{(summary?.grossMargin || 0).toFixed(0)}%</span>
             </div>
           </div>
 
-          <div className="p-3.5 bg-surface border border-border rounded">
-            <div className="text-[11px] text-muted-foreground uppercase font-medium">Payments Received</div>
-            <div className="text-lg md:text-xl font-bold mt-1 text-foreground">
+          <div className="p-3 bg-surface border border-border rounded">
+            <div className="text-[10px] text-muted-foreground uppercase font-medium">Received</div>
+            <div className="text-base md:text-lg font-bold mt-0.5 text-foreground">
               {formatINR(summary?.totalPaymentsReceived || 0)}
             </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5">Verified payment entries</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">Verified payments</div>
           </div>
 
-          <div className="p-3.5 bg-surface border border-border rounded">
-            <div className="text-[11px] text-muted-foreground uppercase font-medium">Outstanding Balance</div>
-            <div className="text-lg md:text-xl font-bold mt-1 text-danger">
+          <div className="p-3 bg-surface border border-border rounded">
+            <div className="text-[10px] text-muted-foreground uppercase font-medium">Outstanding</div>
+            <div className="text-base md:text-lg font-bold mt-0.5 text-danger">
               {formatINR(summary?.outstandingAmount || 0)}
             </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5">Uncollected receivables</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">Receivable</div>
           </div>
         </div>
       )}
 
-      {/* Admin Intelligence Shortcuts */}
+      {/* Admin Shortcuts (Admin only) */}
       {isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <Link
             href="/admin/salespeople"
-            className="p-3 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
+            className="p-2.5 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
           >
-            <div>
-              <div className="font-semibold text-sm text-foreground">Salespeople Margins</div>
-              <div className="text-xs text-muted-foreground">Compare revenue, profit and discounting by salesperson</div>
-            </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="font-semibold text-xs text-foreground">Salespeople Performance</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           </Link>
 
           <Link
             href="/admin/pricing"
-            className="p-3 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
+            className="p-2.5 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
           >
-            <div>
-              <div className="font-semibold text-sm text-foreground">Actual Pricing History</div>
-              <div className="text-xs text-muted-foreground">Product costs vs negotiated selling prices</div>
-            </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="font-semibold text-xs text-foreground">Pricing History</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           </Link>
 
           <Link
             href="/admin/analytics"
-            className="p-3 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
+            className="p-2.5 border border-border bg-card hover:bg-surface rounded transition-colors flex items-center justify-between"
           >
-            <div>
-              <div className="font-semibold text-sm text-foreground">Full Analytics</div>
-              <div className="text-xs text-muted-foreground">Company-wide breakdown and audit trail</div>
-            </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="font-semibold text-xs text-foreground">Company Analytics</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           </Link>
         </div>
       )}
 
       {/* Recent Sales Section */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-muted-foreground" />
-            <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">
-              {isAdmin ? 'Recent Company Orders' : 'Your Recent Sales'}
-            </h2>
+          <div className="font-semibold text-xs uppercase tracking-wide text-foreground">
+            {isAdmin ? 'Recent Orders' : 'Recent Sales'}
           </div>
           <Link
             href="/sales"
             className="text-xs text-muted-foreground hover:text-foreground font-medium flex items-center gap-1"
           >
-            <span>View All Sales</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>View All</span>
+            <ArrowUpRight className="w-3 h-3" />
           </Link>
         </div>
 
@@ -287,17 +266,7 @@ export default function DashboardPage() {
         ) : recentSales.length === 0 ? (
           <div className="p-8 border border-border rounded text-center bg-surface">
             <Receipt className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-            <div className="text-sm font-medium text-foreground">No sales recorded yet.</div>
-            <div className="text-xs text-muted-foreground mt-1 mb-4">
-              Log negotiated sales with customer details and payment proof.
-            </div>
-            <Link
-              href="/sales/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Record First Sale</span>
-            </Link>
+            <div className="text-sm font-medium text-foreground">No sales recorded</div>
           </div>
         ) : (
           <div className="border border-border rounded overflow-hidden divide-y divide-border bg-card">
@@ -305,34 +274,32 @@ export default function DashboardPage() {
               <Link
                 key={sale.id}
                 href={`/sales/${sale.id}`}
-                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-surface transition-colors block"
+                className="p-3 flex items-center justify-between gap-2.5 hover:bg-surface transition-colors"
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono font-semibold text-xs text-foreground">
                       {sale.sale_number}
                     </span>
                     {getStatusBadge(sale.payment_status)}
+                    <span className="text-[11px] text-muted-foreground">{formatDate(sale.sale_date, false)}</span>
                   </div>
-                  <div className="font-medium text-sm text-foreground truncate mt-1">
+                  <div className="font-medium text-sm text-foreground truncate mt-0.5">
                     {sale.customer_name_snapshot}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-3">
-                    <span>{formatDate(sale.sale_date)}</span>
-                    {isAdmin && sale.salesperson && (
-                      <span>Rep: <strong className="font-medium text-foreground">{sale.salesperson.full_name}</strong></span>
-                    )}
-                    <span>{sale.items?.length || 0} product(s)</span>
-                  </div>
+                  {isAdmin && sale.salesperson && (
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      {sale.salesperson.full_name}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-border/50">
+                <div className="text-right shrink-0">
                   <div className="font-bold text-sm text-foreground">
                     {formatINR(sale.total_revenue)}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Profit: <span className="text-success font-medium">{formatINR(sale.gross_profit)}</span>
-                    <span className="ml-1 text-[11px]">({sale.gross_margin.toFixed(0)}%)</span>
+                  <div className="text-xs text-success font-medium">
+                    +{formatINR(sale.gross_profit)}
                   </div>
                 </div>
               </Link>

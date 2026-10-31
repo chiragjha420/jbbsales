@@ -97,8 +97,12 @@ async function runTests() {
   console.log(`  Payment Status: ${createdSale.payment_status} (Expected: partially_paid)`);
   console.log(`  Paid: ₹${createdSale.total_paid} | Outstanding: ₹${createdSale.outstanding}`);
 
-  if (createdSale.total_revenue !== 246900 || createdSale.gross_profit !== 50300) {
-    throw new Error('Financial calculation mismatch on created sale!');
+  const expectedProductCost = snookerTable.cost_price + (ashCue.cost_price * 2);
+  const expectedTotalCost = expectedProductCost + 2200 + 1000;
+  const expectedProfit = 246900 - expectedTotalCost;
+
+  if (createdSale.total_revenue !== 246900 || createdSale.gross_profit !== expectedProfit) {
+    throw new Error(`Financial calculation mismatch on created sale! Got profit: ${createdSale.gross_profit}, expected: ${expectedProfit}`);
   }
 
   // 4. Test Adding Additional Payment Proof Later
@@ -151,8 +155,9 @@ async function runTests() {
 
   // 6. Test Historical Snapshot Integrity: Change product current cost
   console.log('\n[TEST 6] Testing Historical Cost Snapshot Integrity...');
-  console.log(`  Original Table Cost: ₹${snookerTable.cost_price}`);
-  const updatedCost = 210000; // Cost increases in catalog
+  const originalCost = snookerTable.cost_price;
+  console.log(`  Original Table Cost: ₹${originalCost}`);
+  const updatedCost = originalCost + 25000; // Cost increases in catalog
   res = await fetch(`${BASE_URL}/api/products/${snookerTable.id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -161,26 +166,30 @@ async function runTests() {
   data = await res.json();
   console.log(`  Product cost updated in catalog to: ₹${data.product.cost_price}`);
 
-  // Now verify that the previously created sale STILL retains cost at sale ₹185,000 and profit ₹50,300
+  // Now verify that the previously created sale STILL retains the original cost at sale and original profit
   const verifySaleRes = await fetch(`${BASE_URL}/api/sales/${createdSale.id}`);
   const verifySaleData = await verifySaleRes.json();
   const pastTableItem = verifySaleData.sale.items.find((i) => i.product_id === snookerTable.id);
   console.log(`  Historical sale item cost snapshot: ₹${pastTableItem.cost_at_sale}`);
   console.log(`  Historical sale profit: ₹${verifySaleData.sale.gross_profit}`);
-  if (pastTableItem.cost_at_sale !== 185000 || verifySaleData.sale.gross_profit !== 50300) {
+  if (pastTableItem.cost_at_sale !== originalCost || verifySaleData.sale.gross_profit !== expectedProfit) {
     throw new Error('Historical integrity violated! Cost was overwritten by current catalog price!');
   }
   console.log('✓ Historical cost snapshot verified intact! Profit was not corrupted.');
 
   // 7. Test Admin Analytics
   console.log('\n[TEST 7] Testing Company Analytics API...');
-  res = await fetch(`${BASE_URL}/api/analytics/summary`);
+  res = await fetch(`${BASE_URL}/api/analytics/summary`, {
+    headers: { Cookie: 'jbb_user_role=admin; jbb_user_id=00000000-0000-0000-0000-000000000001' },
+  });
   data = await res.json();
   console.log(`✓ Company Analytics: Revenue ₹${data.summary.totalRevenue} | Profit ₹${data.summary.totalGrossProfit} | Margin ${data.summary.grossMargin.toFixed(1)}%`);
 
   // 8. Test Salespeople Comparison Analytics
   console.log('\n[TEST 8] Testing Salespeople Comparison Analytics...');
-  res = await fetch(`${BASE_URL}/api/analytics/salespeople`);
+  res = await fetch(`${BASE_URL}/api/analytics/salespeople`, {
+    headers: { Cookie: 'jbb_user_role=admin; jbb_user_id=00000000-0000-0000-0000-000000000001' },
+  });
   data = await res.json();
   console.log(`✓ Salespeople evaluated: ${data.salespeople.length}`);
   data.salespeople.forEach((sp) => {

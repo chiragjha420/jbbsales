@@ -146,12 +146,7 @@ export default function NewProductPage() {
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">Add New Product</h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Configure unit economics, photos, and discovery tags
-          </div>
-        </div>
+        <h1 className="text-xl font-bold tracking-tight">New Product</h1>
       </div>
 
       {error && (
@@ -164,10 +159,6 @@ export default function NewProductPage() {
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Core details */}
         <div className="p-3.5 bg-surface border border-border rounded space-y-3">
-          <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-            Product Identity
-          </div>
-
           <div>
             <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
               Product Name <span className="text-danger">*</span>
@@ -229,10 +220,6 @@ export default function NewProductPage() {
 
         {/* Pricing Economics */}
         <div className="p-3.5 bg-surface border border-border rounded space-y-3">
-          <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-            Financial Economics (INR)
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
@@ -248,9 +235,6 @@ export default function NewProductPage() {
                 onChange={(e) => setCostPrice(e.target.value)}
                 className="w-full p-2 bg-background border border-border rounded text-foreground font-bold focus:outline-none focus:border-foreground"
               />
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Visible to salespeople to guide negotiations
-              </span>
             </div>
 
             <div>
@@ -266,14 +250,11 @@ export default function NewProductPage() {
                 onChange={(e) => setRecommendedPrice(e.target.value)}
                 className="w-full p-2 bg-background border border-border rounded text-foreground font-semibold focus:outline-none"
               />
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Default baseline for sales quotes
-              </span>
             </div>
 
             <div>
               <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                Minimum Selling Floor (Optional)
+                Minimum Floor Price (Optional)
               </label>
               <input
                 type="number"
@@ -284,18 +265,15 @@ export default function NewProductPage() {
                 onChange={(e) => setMinimumPrice(e.target.value)}
                 className="w-full p-2 bg-background border border-border rounded text-foreground font-semibold focus:outline-none"
               />
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Triggers warning if salesperson prices lower
-              </span>
             </div>
           </div>
         </div>
 
-        {/* Photos Upload & Primary Picker */}
+        {/* Photos Upload */}
         <div className="p-3.5 bg-surface border border-border rounded space-y-3">
           <div className="flex justify-between items-center">
-            <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-              Product Photos <span className="text-danger">*</span>
+            <div className="font-semibold text-foreground uppercase tracking-wide text-[11px]">
+              Photos <span className="text-danger">*</span>
             </div>
             <span className="text-[11px] text-muted-foreground">Select multiple images if needed</span>
           </div>
@@ -350,11 +328,8 @@ export default function NewProductPage() {
 
         {/* Search Keywords */}
         <div className="p-3.5 bg-surface border border-border rounded space-y-2.5">
-          <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-            Search Keywords <span className="text-danger">*</span>
-          </div>
-          <div className="text-[11px] text-muted-foreground">
-            Enables instant mobile search for terms like &quot;tournament&quot;, &quot;ash&quot;, &quot;slates&quot;, &quot;3/4&quot;, etc.
+          <div className="font-semibold text-foreground uppercase tracking-wide text-[11px]">
+            Keywords <span className="text-danger">*</span>
           </div>
 
           <div className="flex gap-2">

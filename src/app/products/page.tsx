@@ -56,12 +56,7 @@ export default function ProductsPage() {
     <div className="p-3.5 md:p-6 max-w-6xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Product Catalog</h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Cost prices, recommended selling rates, keywords and specifications
-          </div>
-        </div>
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Products</h1>
 
         <Link
           href="/products/new"
@@ -113,10 +108,7 @@ export default function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="p-8 border border-border rounded text-center bg-surface">
           <Package className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-          <div className="text-sm font-semibold text-foreground">No products found.</div>
-          <div className="text-xs text-muted-foreground mt-1 mb-3">
-            Add tables, cues, and accessories to make them searchable during sale creation.
-          </div>
+          <div className="text-sm font-semibold text-foreground mb-3">No products found.</div>
           <Link
             href="/products/new"
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-primary-foreground font-semibold text-xs rounded"

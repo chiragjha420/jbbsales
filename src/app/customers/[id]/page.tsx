@@ -139,12 +139,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div>
-            <h1 className="font-bold text-base md:text-xl tracking-tight">{customer.name}</h1>
-            <div className="text-xs text-muted-foreground">
-              {customer.company ? `${customer.company} · ` : ''}Phone: <strong className="text-foreground">{customer.phone}</strong>
-            </div>
-          </div>
+          <h1 className="font-bold text-base md:text-xl tracking-tight">{customer.name}</h1>
         </div>
 
         <Link
@@ -152,66 +147,66 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors"
         >
           <PlusCircle className="w-3.5 h-3.5" />
-          <span>New Sale for Customer</span>
+          <span>New Sale</span>
         </Link>
       </div>
 
       {/* Financial Overview Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Lifetime Revenue</div>
-          <div className="text-lg font-bold text-foreground mt-1">{formatINR(totalRevenue)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">{sales.length} order(s)</div>
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Revenue</div>
+          <div className="text-base font-bold text-foreground mt-1">{formatINR(totalRevenue)}</div>
         </div>
 
-        <div className="p-3.5 bg-surface border border-border rounded">
+        <div className="p-3 bg-surface border border-border rounded">
           <div className="text-[10px] text-muted-foreground uppercase font-medium">Gross Profit</div>
-          <div className="text-lg font-bold text-success mt-1">{formatINR(grossProfit)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
-            Margin: {totalRevenue > 0 ? `${((grossProfit / totalRevenue) * 100).toFixed(0)}%` : '0%'}
-          </div>
+          <div className="text-base font-bold text-success mt-1">{formatINR(grossProfit)}</div>
         </div>
 
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Total Paid</div>
-          <div className="text-lg font-bold text-foreground mt-1">{formatINR(totalPaid)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Collected funds</div>
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Paid</div>
+          <div className="text-base font-bold text-foreground mt-1">{formatINR(totalPaid)}</div>
         </div>
 
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Outstanding Due</div>
-          <div className="text-lg font-bold text-danger mt-1">{formatINR(outstanding)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Receivable balance</div>
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Outstanding</div>
+          <div className="text-base font-bold text-danger mt-1">{formatINR(outstanding)}</div>
         </div>
       </div>
 
       {/* Customer Info & Ownership Reassignment */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div className="p-3.5 bg-surface border border-border rounded space-y-2">
-          <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-            Contact & Address Details
+        <div className="p-3 bg-surface border border-border rounded space-y-2">
+          <div className="font-semibold text-foreground uppercase tracking-wide text-[10px]">
+            Details
           </div>
           <div className="space-y-1 divide-y divide-border/60">
+            {customer.company && (
+              <div className="flex justify-between py-1">
+                <span className="text-muted-foreground">Company:</span>
+                <span className="font-medium text-foreground">{customer.company}</span>
+              </div>
+            )}
             {customer.contact_person && (
               <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Contact Person:</span>
-                <span className="font-semibold text-foreground">{customer.contact_person}</span>
+                <span className="text-muted-foreground">Contact:</span>
+                <span className="font-medium text-foreground">{customer.contact_person}</span>
               </div>
             )}
             <div className="flex justify-between py-1">
               <span className="text-muted-foreground">Phone:</span>
-              <span className="font-semibold text-foreground">{customer.phone}</span>
+              <span className="font-medium text-foreground">{customer.phone}</span>
             </div>
             {customer.email && (
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">Email:</span>
-                <span className="font-semibold text-foreground">{customer.email}</span>
+                <span className="font-medium text-foreground">{customer.email}</span>
               </div>
             )}
             {customer.city && (
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">City:</span>
-                <span className="font-semibold text-foreground">{customer.city}</span>
+                <span className="font-medium text-foreground">{customer.city}</span>
               </div>
             )}
             {customer.address && (
@@ -230,25 +225,22 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
         </div>
 
         {/* Ownership & Admin Reassignment */}
-        <div className="p-3.5 bg-surface border border-border rounded space-y-3">
-          <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-            Salesperson Ownership
+        <div className="p-3 bg-surface border border-border rounded space-y-2.5">
+          <div className="font-semibold text-foreground uppercase tracking-wide text-[10px]">
+            Assigned Salesperson
           </div>
 
           <div className="text-xs">
-            <span className="text-muted-foreground">Currently Assigned: </span>
+            <span className="text-muted-foreground">Salesperson: </span>
             <strong className="text-foreground font-semibold">
               {customer.assigned_salesperson?.full_name || 'Unassigned'}
             </strong>
-            <div className="text-[11px] text-muted-foreground mt-0.5">
-              Email: {customer.assigned_salesperson?.email || 'N/A'}
-            </div>
           </div>
 
-          {isAdmin ? (
+          {isAdmin && (
             <div className="pt-2 border-t border-border space-y-2">
               <label className="text-[10px] text-muted-foreground uppercase font-medium block">
-                Reassign Customer (Admin Action)
+                Reassign Salesperson
               </label>
               <div className="flex gap-2">
                 <select
@@ -259,7 +251,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                   <option value="">Select Salesperson...</option>
                   {salespeople.map((sp) => (
                     <option key={sp.id} value={sp.id}>
-                      {sp.full_name} ({sp.email})
+                      {sp.full_name}
                     </option>
                   ))}
                 </select>
@@ -269,19 +261,15 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                   onClick={handleReassign}
                   className="px-3 py-1.5 bg-primary text-primary-foreground font-semibold rounded text-xs hover:bg-primary-hover disabled:opacity-40"
                 >
-                  {reassigning ? 'Reassigning...' : 'Reassign'}
+                  {reassigning ? 'Saving...' : 'Reassign'}
                 </button>
               </div>
 
               {reassignSuccess && (
-                <div className="text-[11px] text-success font-medium flex items-center gap-1">
-                  Customer reassigned successfully. Past sales retain their original rep.
+                <div className="text-[11px] text-success font-medium">
+                  Reassigned.
                 </div>
               )}
-            </div>
-          ) : (
-            <div className="text-[11px] text-muted-foreground pt-1 border-t border-border">
-              Customer ownership is managed by company administrators. Historical orders permanently retain the representative who conducted the sale.
             </div>
           )}
         </div>

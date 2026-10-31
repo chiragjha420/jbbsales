@@ -4,21 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Sale, PaymentMethod, Payment } from '@/types';
+import { Sale, PaymentMethod } from '@/types';
 import { formatINR, formatDate } from '@/lib/calculations';
 import {
   ArrowLeft,
-  Receipt,
-  User,
-  Calendar,
   CheckCircle2,
   Clock,
   AlertCircle,
   PlusCircle,
   Upload,
-  Image as ImageIcon,
   X,
-  FileText,
   ShieldAlert,
 } from 'lucide-react';
 
@@ -110,7 +105,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
     e.preventDefault();
     const amount = parseFloat(newPaymentAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid payment amount greater than zero.');
+      alert('Please enter a valid payment amount.');
       return;
     }
     if (newPaymentProofs.length === 0) {
@@ -199,47 +194,41 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Sales Registry</span>
+          <span>Back to Sales</span>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="p-3.5 md:p-6 max-w-4xl mx-auto space-y-5 pb-24">
-      {/* Top Breadcrumb & Actions */}
+    <div className="p-3.5 md:p-6 max-w-4xl mx-auto space-y-4 pb-24">
+      {/* Top Header & Actions */}
       <div className="flex items-center justify-between gap-2 pb-2 border-b border-border">
         <div className="flex items-center gap-2">
           <Link
             href="/sales"
             className="p-1.5 border border-border rounded text-muted-foreground hover:text-foreground"
-            title="Back to Sales List"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-bold text-base md:text-lg">{sale.sale_number}</span>
-              {sale.payment_status === 'paid' ? (
-                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-success-surface text-success font-semibold">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Paid</span>
-                </span>
-              ) : sale.payment_status === 'partially_paid' ? (
-                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-warning-surface text-warning font-semibold">
-                  <Clock className="w-3 h-3" />
-                  <span>Partially Paid</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-danger-surface text-danger font-semibold">
-                  <AlertCircle className="w-3 h-3" />
-                  <span>Unpaid</span>
-                </span>
-              )}
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              Logged on {formatDate(sale.sale_date, true)}
-            </div>
+          <div className="flex items-center gap-2">
+            <h1 className="font-mono font-bold text-base md:text-lg">{sale.sale_number}</h1>
+            {sale.payment_status === 'paid' ? (
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-success-surface text-success font-semibold">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>Paid</span>
+              </span>
+            ) : sale.payment_status === 'partially_paid' ? (
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-warning-surface text-warning font-semibold">
+                <Clock className="w-3 h-3" />
+                <span>Partially Paid</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-danger-surface text-danger font-semibold">
+                <AlertCircle className="w-3 h-3" />
+                <span>Unpaid</span>
+              </span>
+            )}
           </div>
         </div>
 
@@ -253,92 +242,119 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
         </button>
       </div>
 
-      {/* Primary Customer & Salesperson Info Bar */}
+      {/* Primary Customer & Details */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
         <div className="p-3 bg-surface border border-border rounded space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-            <User className="w-3 h-3" />
-            <span>Customer Details</span>
-          </div>
+          <div className="text-[10px] text-muted-foreground uppercase font-semibold">Customer</div>
           <div className="font-bold text-sm text-foreground">{sale.customer_name_snapshot}</div>
           {sale.customer && (
-            <div className="text-muted-foreground space-y-0.5">
-              {sale.customer.company && <div>Company: {sale.customer.company}</div>}
-              <div>Phone: <strong className="text-foreground">{sale.customer.phone}</strong></div>
+            <div className="text-muted-foreground">
+              {sale.customer.company && <span>{sale.customer.company} • </span>}
+              <span>{sale.customer.phone}</span>
             </div>
           )}
         </div>
 
         <div className="p-3 bg-surface border border-border rounded space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase font-semibold flex items-center gap-1">
-            <Receipt className="w-3 h-3" />
-            <span>Sale Ownership & Attribution</span>
-          </div>
-          <div className="font-bold text-sm text-foreground">
+          <div className="text-[10px] text-muted-foreground uppercase font-semibold">Date & Salesperson</div>
+          <div className="font-semibold text-foreground">
             {sale.salesperson?.full_name || 'Assigned Rep'}
           </div>
           <div className="text-muted-foreground">
-            Email: {sale.salesperson?.email || 'N/A'}
-          </div>
-          <div className="text-[11px] text-muted-foreground font-mono">
-            Sale Reference: {sale.sale_number}
+            {formatDate(sale.sale_date, false)}
           </div>
         </div>
       </div>
 
-      {/* Products & Line Economics Table */}
+      {/* Products List: NO horizontal scroll on phone */}
       <div className="border border-border rounded overflow-hidden bg-card">
         <div className="p-3 bg-surface border-b border-border font-semibold text-xs text-foreground uppercase tracking-wider">
-          Products Sold & Cost Snapshots at Sale Time
+          Products
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-muted text-muted-foreground uppercase text-[10px] border-b border-border">
-              <tr>
-                <th className="p-3">Product Name & SKU</th>
-                <th className="p-3 text-right">Qty</th>
-                <th className="p-3 text-right">Selling Price</th>
-                <th className="p-3 text-right">Cost (Snapshot)</th>
-                <th className="p-3 text-right">Line Revenue</th>
-                <th className="p-3 text-right">Line Profit</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {sale.items?.map((item) => (
-                <tr key={item.id} className="hover:bg-surface/50">
-                  <td className="p-3">
-                    <div className="font-semibold text-foreground text-sm">{item.product_name_snapshot}</div>
-                    <div className="text-[11px] text-muted-foreground font-mono">{item.sku_snapshot || 'N/A'}</div>
-                  </td>
-                  <td className="p-3 text-right font-medium">{item.quantity}</td>
-                  <td className="p-3 text-right font-medium">{formatINR(item.selling_price)}</td>
-                  <td className="p-3 text-right text-muted-foreground font-mono">
-                    {formatINR(item.cost_at_sale)}
-                  </td>
-                  <td className="p-3 text-right font-bold text-foreground">
-                    {formatINR(item.line_revenue)}
-                  </td>
-                  <td className="p-3 text-right font-bold text-success">
-                    {formatINR(item.line_profit)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Mobile View: Stacked Card Rows (100% width, zero horizontal scrolling) */}
+        <div className="divide-y divide-border block sm:hidden">
+          {sale.items?.map((item) => (
+            <div key={item.id} className="p-3 text-xs space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="font-semibold text-sm text-foreground">{item.product_name_snapshot}</div>
+                  {item.sku_snapshot && (
+                    <div className="text-[11px] text-muted-foreground font-mono">{item.sku_snapshot}</div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-sm text-foreground">{formatINR(item.line_revenue)}</div>
+                  <div className="text-[11px] text-success font-semibold">+{formatINR(item.line_profit)} profit</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1 pt-1 border-t border-border/50 text-[11px]">
+                <div>
+                  <span className="text-muted-foreground block text-[9px] uppercase">Qty</span>
+                  <span className="font-medium text-foreground">{item.quantity}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[9px] uppercase">Selling Price</span>
+                  <span className="font-medium text-foreground">{formatINR(item.selling_price)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[9px] uppercase">Cost (Snapshot)</span>
+                  <span className="font-mono text-muted-foreground">{formatINR(item.cost_at_sale)}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Desktop View Table: Full visible width */}
+        <table className="w-full text-left text-xs hidden sm:table">
+          <thead className="bg-muted text-muted-foreground uppercase text-[10px] border-b border-border">
+            <tr>
+              <th className="p-3">Product</th>
+              <th className="p-3 text-right">Qty</th>
+              <th className="p-3 text-right">Selling Price</th>
+              <th className="p-3 text-right">Cost (Snapshot)</th>
+              <th className="p-3 text-right">Revenue</th>
+              <th className="p-3 text-right">Profit</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {sale.items?.map((item) => (
+              <tr key={item.id} className="hover:bg-surface/50">
+                <td className="p-3">
+                  <div className="font-semibold text-foreground text-sm">{item.product_name_snapshot}</div>
+                  {item.sku_snapshot && (
+                    <div className="text-[11px] text-muted-foreground font-mono">{item.sku_snapshot}</div>
+                  )}
+                </td>
+                <td className="p-3 text-right font-medium">{item.quantity}</td>
+                <td className="p-3 text-right font-medium">{formatINR(item.selling_price)}</td>
+                <td className="p-3 text-right text-muted-foreground font-mono">
+                  {formatINR(item.cost_at_sale)}
+                </td>
+                <td className="p-3 text-right font-bold text-foreground">
+                  {formatINR(item.line_revenue)}
+                </td>
+                <td className="p-3 text-right font-bold text-success">
+                  {formatINR(item.line_profit)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Courier, Additional Charges & Profitability Breakdown */}
+      {/* Courier & Totals Breakdown */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
         {/* Charges */}
         <div className="p-3 bg-surface border border-border rounded space-y-2">
           <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[10px]">
-            Delivery & Additional Billed Items
+            Delivery & Charges
           </div>
           <div className="space-y-1.5 divide-y divide-border/60">
             <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Courier Charged to Customer</span>
+              <span className="text-muted-foreground">Courier Charged</span>
               <span className="font-semibold">{formatINR(sale.courier_charge)}</span>
             </div>
             <div className="flex justify-between py-1">
@@ -346,17 +362,17 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
               <span className="font-mono text-muted-foreground">{formatINR(sale.courier_cost)}</span>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Other Charges Billed</span>
+              <span className="text-muted-foreground">Other Charges</span>
               <span className="font-semibold">{formatINR(sale.other_charge)}</span>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Other Direct Costs</span>
+              <span className="text-muted-foreground">Other Cost</span>
               <span className="font-mono text-muted-foreground">{formatINR(sale.other_cost)}</span>
             </div>
             {sale.notes && (
-              <div className="pt-2">
-                <div className="text-muted-foreground font-medium text-[10px] uppercase">Notes:</div>
-                <div className="text-foreground mt-0.5">{sale.notes}</div>
+              <div className="pt-2 text-muted-foreground">
+                <span className="font-medium text-foreground">Notes: </span>
+                {sale.notes}
               </div>
             )}
           </div>
@@ -365,27 +381,27 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
         {/* Totals */}
         <div className="p-3 bg-surface border border-border rounded space-y-2">
           <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[10px]">
-            Gross Financial Summary
+            Financial Summary
           </div>
           <div className="space-y-1.5 divide-y divide-border/60">
             <div className="flex justify-between py-1 text-sm font-bold">
-              <span>Total Sale Revenue</span>
+              <span>Total Revenue</span>
               <span>{formatINR(sale.total_revenue)}</span>
             </div>
             <div className="flex justify-between py-1 text-muted-foreground">
-              <span>Total Actual Costs</span>
+              <span>Total Cost</span>
               <span className="font-mono">{formatINR(sale.total_cost)}</span>
             </div>
             <div className="flex justify-between py-1 text-sm font-bold text-success">
               <span>Gross Profit</span>
-              <span>{formatINR(sale.gross_profit)} ({sale.gross_margin.toFixed(1)}%)</span>
+              <span>{formatINR(sale.gross_profit)} ({sale.gross_margin.toFixed(0)}%)</span>
             </div>
             <div className="flex justify-between py-1 text-foreground font-semibold">
-              <span>Total Received to Date</span>
+              <span>Paid</span>
               <span>{formatINR(sale.total_paid || 0)}</span>
             </div>
             <div className="flex justify-between py-1 text-sm font-bold">
-              <span>Outstanding Receivable</span>
+              <span>Outstanding</span>
               <span className={sale.outstanding && sale.outstanding > 0 ? 'text-danger' : 'text-success'}>
                 {formatINR(sale.outstanding || 0)}
               </span>
@@ -394,52 +410,48 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {/* Payment Registry & Proof Evidence */}
+      {/* Payment Records & Screenshots */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="font-semibold text-sm text-foreground uppercase tracking-wide">
-            Payment Records & Screenshot Audit Trail ({sale.payments?.length || 0})
+          <div className="font-semibold text-xs text-foreground uppercase tracking-wide">
+            Payments ({sale.payments?.length || 0})
           </div>
           <button
             type="button"
             onClick={() => setShowAddPaymentModal(true)}
-            className="text-xs font-semibold underline text-foreground flex items-center gap-1"
+            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>+ Record New Payment</span>
+            <span>Add Payment</span>
           </button>
         </div>
 
         {(!sale.payments || sale.payments.length === 0) ? (
-          <div className="p-6 border border-border rounded text-center bg-surface text-xs text-muted-foreground">
-            No payments recorded yet for this sale. Outstanding amount: <strong>{formatINR(sale.total_revenue)}</strong>.
+          <div className="p-4 border border-border rounded text-center bg-surface text-xs text-muted-foreground">
+            No payments recorded yet.
           </div>
         ) : (
           <div className="space-y-3">
             {sale.payments.map((p, pIdx) => (
-              <div key={p.id} className="p-3.5 border border-border rounded bg-card space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-2 text-xs">
+              <div key={p.id} className="p-3 border border-border rounded bg-card space-y-2.5">
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-2 text-xs">
                   <div>
-                    <span className="font-semibold text-muted-foreground uppercase text-[10px] mr-2">
-                      Payment #{pIdx + 1}
-                    </span>
                     <strong className="text-sm font-bold text-foreground">{formatINR(p.amount)}</strong>
                     <span className="ml-2 uppercase px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">
                       {p.payment_method.replace('_', ' ')}
                     </span>
                   </div>
-                  <div className="text-muted-foreground">
-                    Received: {formatDate(p.payment_date, true)}
-                    {p.notes && <span className="ml-2 text-foreground">· Ref: {p.notes}</span>}
+                  <div className="text-muted-foreground text-[11px]">
+                    {formatDate(p.payment_date, false)}
+                    {p.notes && <span className="ml-1 text-foreground">· {p.notes}</span>}
                   </div>
                 </div>
 
-                {/* Proof Gallery */}
-                <div className="space-y-2">
+                {/* Screenshots Gallery */}
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>Verified Payment Screenshots ({p.proofs?.length || 0})</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      Screenshots ({p.proofs?.length || 0})
                     </span>
 
                     <button
@@ -448,14 +460,12 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                       className="text-[11px] font-medium text-foreground underline hover:text-primary flex items-center gap-1"
                     >
                       <Upload className="w-3 h-3" />
-                      <span>+ Add More Proof</span>
+                      <span>Add Screenshot</span>
                     </button>
                   </div>
 
-                  {(!p.proofs || p.proofs.length === 0) ? (
-                    <div className="text-xs text-muted-foreground italic">No screenshots attached.</div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                  {p.proofs && p.proofs.length > 0 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                       {p.proofs.map((proof) => (
                         <div
                           key={proof.id}
@@ -468,11 +478,6 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                             alt={proof.file_name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
-                          <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors flex items-center justify-center">
-                            <span className="opacity-0 group-hover:opacity-100 text-[10px] font-bold bg-background/90 px-1.5 py-0.5 rounded text-foreground">
-                              View
-                            </span>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -489,10 +494,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
           <div className="bg-card border border-border rounded-lg max-w-md w-full shadow-2xl p-4 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-border pb-2">
-              <div>
-                <div className="font-bold text-sm">Add Payment to Sale</div>
-                <div className="text-xs text-muted-foreground">Order: {sale.sale_number}</div>
-              </div>
+              <div className="font-bold text-sm">Add Payment</div>
               <button
                 type="button"
                 onClick={() => setShowAddPaymentModal(false)}
@@ -506,7 +508,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-[10px] text-muted-foreground uppercase font-medium">
-                    Amount Received (₹) <span className="text-danger">*</span>
+                    Amount (₹) *
                   </label>
                   {sale.outstanding && sale.outstanding > 0 && (
                     <button
@@ -514,7 +516,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                       onClick={() => setNewPaymentAmount(sale.outstanding!.toString())}
                       className="text-[10px] text-muted-foreground hover:text-foreground underline"
                     >
-                      Fill Balance ({formatINR(sale.outstanding)})
+                      Full Balance ({formatINR(sale.outstanding)})
                     </button>
                   )}
                 </div>
@@ -523,7 +525,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                   required
                   min="1"
                   step="0.01"
-                  placeholder="e.g. 50000"
+                  placeholder="50000"
                   value={newPaymentAmount}
                   onChange={(e) => setNewPaymentAmount(e.target.value)}
                   className="w-full p-2 bg-background border border-border rounded font-bold text-foreground focus:outline-none focus:border-foreground text-sm"
@@ -532,15 +534,15 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
 
               <div>
                 <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                  Payment Mode <span className="text-danger">*</span>
+                  Payment Mode *
                 </label>
                 <select
                   value={newPaymentMethod}
                   onChange={(e) => setNewPaymentMethod(e.target.value as PaymentMethod)}
                   className="w-full p-2 bg-background border border-border rounded text-foreground text-xs focus:outline-none"
                 >
-                  <option value="upi">UPI (GPay / PhonePe / Paytm / QR)</option>
-                  <option value="bank_transfer">Bank Transfer (NEFT / RTGS / IMPS)</option>
+                  <option value="upi">UPI</option>
+                  <option value="bank_transfer">Bank Transfer</option>
                   <option value="cash">Cash</option>
                   <option value="other">Other</option>
                 </select>
@@ -548,11 +550,11 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
 
               <div>
                 <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                  Transaction Reference / UTR
+                  Reference / Note
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. UPI Ref 382910482910"
+                  placeholder="e.g. UTR / Ref Number"
                   value={newPaymentNotes}
                   onChange={(e) => setNewPaymentNotes(e.target.value)}
                   className="w-full p-2 bg-background border border-border rounded text-foreground focus:outline-none"
@@ -562,12 +564,11 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
               {/* Multiple Screenshot Upload */}
               <div>
                 <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                  Payment Proof Screenshots <span className="text-danger">*</span>
+                  Screenshot Proof *
                 </label>
                 <label className="border border-border hover:border-foreground border-dashed rounded p-3 cursor-pointer bg-surface flex flex-col items-center justify-center text-center">
-                  <Upload className="w-5 h-5 text-muted-foreground mb-1" />
-                  <span className="font-semibold text-xs text-foreground">Attach Screenshot Evidence</span>
-                  <span className="text-[10px] text-muted-foreground mt-0.5">Select multiple images if needed</span>
+                  <Upload className="w-4 h-4 text-muted-foreground mb-1" />
+                  <span className="font-semibold text-xs text-foreground">Attach Screenshot</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -609,7 +610,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                   disabled={savingPayment}
                   className="px-4 py-1.5 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary-hover disabled:opacity-50"
                 >
-                  {savingPayment ? 'Saving Payment...' : 'Record Payment'}
+                  {savingPayment ? 'Saving...' : 'Record Payment'}
                 </button>
               </div>
             </form>
@@ -622,7 +623,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
           <div className="bg-card border border-border rounded-lg max-w-sm w-full shadow-2xl p-4 space-y-4">
             <div className="flex justify-between items-center border-b border-border pb-2">
-              <div className="font-bold text-sm">Add Additional Proof Image</div>
+              <div className="font-bold text-sm">Add Screenshot</div>
               <button
                 type="button"
                 onClick={() => {
@@ -636,14 +637,10 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="text-muted-foreground">
-                Appends another screenshot to the existing payment record without overwriting previous evidence.
-              </div>
-
               <label className="border border-border hover:border-foreground border-dashed rounded p-4 cursor-pointer bg-surface flex flex-col items-center justify-center text-center">
-                <Upload className="w-5 h-5 text-muted-foreground mb-1" />
+                <Upload className="w-4 h-4 text-muted-foreground mb-1" />
                 <span className="font-semibold text-xs text-foreground">
-                  {extraProofFile ? extraProofFile.fileName : 'Select Image File'}
+                  {extraProofFile ? extraProofFile.fileName : 'Select Image'}
                 </span>
                 <input
                   type="file"
@@ -654,7 +651,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
               </label>
 
               {extraProofFile && (
-                <div className="w-24 h-24 mx-auto border border-border rounded overflow-hidden">
+                <div className="w-20 h-20 mx-auto border border-border rounded overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={extraProofFile.dataUrl} alt="extra" className="w-full h-full object-cover" />
                 </div>
@@ -677,7 +674,7 @@ export default function SaleDetailPage({ params }: { params: { id: string } }) {
                   onClick={handleUploadExtraProof}
                   className="px-4 py-1.5 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary-hover disabled:opacity-50"
                 >
-                  {uploadingExtraProof ? 'Uploading...' : 'Attach Proof'}
+                  {uploadingExtraProof ? 'Uploading...' : 'Save Screenshot'}
                 </button>
               </div>
             </div>

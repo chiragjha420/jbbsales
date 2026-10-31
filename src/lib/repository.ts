@@ -577,6 +577,33 @@ export const repository = {
     return newImage;
   },
 
+  async deleteProductImage(productId: string, imageId: string): Promise<void> {
+    const db = ensureDb();
+    const idx = db.product_images.findIndex((img) => img.id === imageId && img.product_id === productId);
+    if (idx !== -1) {
+      const wasPrimary = db.product_images[idx].is_primary;
+      db.product_images.splice(idx, 1);
+      // If deleted image was primary, make the first remaining image primary
+      if (wasPrimary) {
+        const remaining = db.product_images.filter((img) => img.product_id === productId);
+        if (remaining.length > 0) {
+          remaining[0].is_primary = true;
+        }
+      }
+      saveDb(db);
+    }
+  },
+
+  async setPrimaryProductImage(productId: string, imageId: string): Promise<void> {
+    const db = ensureDb();
+    db.product_images.forEach((img) => {
+      if (img.product_id === productId) {
+        img.is_primary = img.id === imageId;
+      }
+    });
+    saveDb(db);
+  },
+
   // -------------------------------------------------------------------
   // Customers
   // -------------------------------------------------------------------

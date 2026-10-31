@@ -88,65 +88,59 @@ export default function SalesHistoryPage() {
   };
 
   return (
-    <div className="p-3.5 md:p-6 max-w-6xl mx-auto space-y-4">
+    <div className="p-3.5 md:p-6 max-w-5xl mx-auto space-y-4 pb-20">
       {/* Title & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Sales Records</h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {isAdmin ? 'Complete company transaction registry & economics' : 'Your negotiated orders & payment statuses'}
-          </div>
-        </div>
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-border">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Sales</h1>
 
         <Link
           href="/sales/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-3.5 h-3.5" />
           <span>New Sale</span>
         </Link>
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="flex flex-col md:flex-row gap-2.5 items-stretch md:items-center">
+      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
         <form onSubmit={handleSearchSubmit} className="flex-1 relative">
-          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-2.5" />
           <input
             type="text"
-            placeholder="Search by sale #, customer name, or salesperson..."
+            placeholder="Search by sale #, customer, or salesperson..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded text-xs text-foreground focus:outline-none focus:border-foreground"
+            className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded text-xs text-foreground focus:outline-none focus:border-foreground"
           />
         </form>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-          <div className="flex items-center gap-1 bg-surface border border-border rounded p-1 text-xs shrink-0">
-            <Filter className="w-3.5 h-3.5 text-muted-foreground ml-1" />
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-surface border border-border rounded px-2 py-1 text-xs shrink-0 flex-1 sm:flex-initial">
+            <Filter className="w-3.5 h-3.5 text-muted-foreground" />
             <select
               value={paymentStatus}
               onChange={(e) => setPaymentStatus(e.target.value)}
-              className="bg-transparent text-xs text-foreground focus:outline-none pr-2 py-0.5"
+              className="bg-transparent text-xs text-foreground focus:outline-none w-full"
             >
-              <option value="all">All Statuses</option>
+              <option value="all">All</option>
               <option value="paid">Paid</option>
               <option value="partially_paid">Partially Paid</option>
               <option value="unpaid">Unpaid</option>
-              <option value="overpaid">Overpaid</option>
             </select>
           </div>
 
-          <div className="flex items-center gap-1 bg-surface border border-border rounded p-1 text-xs shrink-0">
-            <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
+          <div className="flex items-center gap-1 bg-surface border border-border rounded px-2 py-1 text-xs shrink-0 flex-1 sm:flex-initial">
+            <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent text-xs text-foreground focus:outline-none pr-2 py-0.5"
+              className="bg-transparent text-xs text-foreground focus:outline-none w-full"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="highest_revenue">Highest Revenue</option>
-              <option value="highest_profit">Highest Profit</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="highest_revenue">Revenue</option>
+              <option value="highest_profit">Profit</option>
             </select>
           </div>
         </div>
@@ -155,75 +149,62 @@ export default function SalesHistoryPage() {
       {/* Sales List */}
       {loading ? (
         <div className="space-y-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-18 bg-surface animate-pulse rounded border border-border" />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-16 bg-surface animate-pulse rounded border border-border" />
           ))}
         </div>
       ) : sales.length === 0 ? (
         <div className="p-8 border border-border rounded text-center bg-surface">
           <Receipt className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-          <div className="text-sm font-semibold text-foreground">No sales found matching your criteria.</div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Try adjusting your search query or status filter.
-          </div>
+          <div className="text-sm font-semibold text-foreground">No sales found</div>
         </div>
       ) : (
         <div className="border border-border rounded overflow-hidden divide-y divide-border bg-card">
-          {sales.map((sale) => (
-            <Link
-              key={sale.id}
-              href={`/sales/${sale.id}`}
-              className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-surface transition-colors block"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-bold text-xs text-foreground">
-                    {sale.sale_number}
-                  </span>
-                  {getStatusBadge(sale.payment_status)}
-                  <span className="text-xs text-muted-foreground">
-                    {formatDate(sale.sale_date, false)}
-                  </span>
-                </div>
-
-                <div className="font-semibold text-sm text-foreground mt-1 truncate">
-                  {sale.customer_name_snapshot}
-                </div>
-
-                <div className="text-xs text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  {isAdmin && sale.salesperson && (
-                    <span>
-                      Salesperson: <strong className="text-foreground font-medium">{sale.salesperson.full_name}</strong>
+          {sales.map((sale) => {
+            const itemCount = sale.items?.length || 1;
+            return (
+              <Link
+                key={sale.id}
+                href={`/sales/${sale.id}`}
+                className="p-3 flex items-center justify-between gap-3 hover:bg-surface transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono font-bold text-xs text-foreground">
+                      {sale.sale_number}
                     </span>
-                  )}
-                  <span>
-                    Items: {sale.items?.length || 0} ({sale.items?.map((i) => i.product_name_snapshot).join(', ')})
-                  </span>
-                </div>
-              </div>
+                    {getStatusBadge(sale.payment_status)}
+                    <span className="text-[11px] text-muted-foreground">
+                      {formatDate(sale.sale_date, false)}
+                    </span>
+                  </div>
 
-              <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-border/50 shrink-0">
-                <div className="text-right">
+                  <div className="font-semibold text-sm text-foreground mt-1 truncate">
+                    {sale.customer_name_snapshot}
+                  </div>
+
+                  <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                    <span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
+                    {isAdmin && sale.salesperson && (
+                      <>
+                        <span>•</span>
+                        <span>{sale.salesperson.full_name}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
                   <div className="font-bold text-sm text-foreground">
                     {formatINR(sale.total_revenue)}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Profit: <span className="text-success font-medium">{formatINR(sale.gross_profit)}</span>
-                    <span className="ml-1 text-[11px]">({sale.gross_margin.toFixed(0)}%)</span>
+                  <div className="text-xs text-success font-medium">
+                    +{formatINR(sale.gross_profit)}
                   </div>
                 </div>
-
-                <div className="hidden sm:flex items-center text-xs text-muted-foreground mt-1">
-                  {sale.outstanding && sale.outstanding > 0 ? (
-                    <span className="text-danger font-medium">Due: {formatINR(sale.outstanding)}</span>
-                  ) : (
-                    <span className="text-success font-medium">Fully Paid</span>
-                  )}
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

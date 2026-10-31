@@ -104,20 +104,15 @@ export default function CustomersPage() {
   return (
     <div className="p-3.5 md:p-6 max-w-6xl mx-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Customer Directory</h1>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Clubs, lounges, resorts, and commercial billiard buyers
-          </div>
-        </div>
+      <div className="flex items-center justify-between pb-2 border-b border-border">
+        <h1 className="text-xl font-bold tracking-tight">Customers</h1>
 
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover font-semibold text-xs rounded transition-colors"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="w-3.5 h-3.5" />
           <span>Add Customer</span>
         </button>
       </div>
@@ -127,7 +122,7 @@ export default function CustomersPage() {
         <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5" />
         <input
           type="text"
-          placeholder="Search by customer name, club/company, phone, or contact person..."
+          placeholder="Search by name, company, or phone..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded text-xs text-foreground focus:outline-none focus:border-foreground"
@@ -136,26 +131,15 @@ export default function CustomersPage() {
 
       {/* Customer List */}
       {loading ? (
-        <div className="space-y-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 bg-surface animate-pulse rounded border border-border" />
+        <div className="space-y-1">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-12 bg-surface animate-pulse rounded border border-border" />
           ))}
         </div>
       ) : customers.length === 0 ? (
         <div className="p-8 border border-border rounded text-center bg-surface">
           <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
           <div className="text-sm font-semibold text-foreground">No customers found.</div>
-          <div className="text-xs text-muted-foreground mt-1 mb-3">
-            Add clubs and buyers to associate with sales records.
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-primary-foreground font-semibold text-xs rounded"
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>Add Customer</span>
-          </button>
         </div>
       ) : (
         <div className="border border-border rounded overflow-hidden divide-y divide-border bg-card">
@@ -163,27 +147,15 @@ export default function CustomersPage() {
             <Link
               key={c.id}
               href={`/customers/${c.id}`}
-              className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-surface transition-colors block"
+              className="px-3.5 py-2.5 flex items-center justify-between gap-2 hover:bg-surface transition-colors"
             >
-              <div>
-                <div className="font-bold text-sm text-foreground">{c.name}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  {c.company && <span>Company: <strong className="text-foreground">{c.company}</strong></span>}
-                  {c.contact_person && <span>Contact: {c.contact_person}</span>}
-                  <span>Phone: <strong className="text-foreground">{c.phone}</strong></span>
-                  {c.city && <span>City: {c.city}</span>}
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm text-foreground truncate">{c.name}</div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {[c.company, c.phone, c.city].filter(Boolean).join(' · ')}
                 </div>
-                {isAdmin && c.assigned_salesperson && (
-                  <div className="text-[11px] text-muted-foreground mt-1">
-                    Assigned Rep: <span className="font-medium text-foreground">{c.assigned_salesperson.full_name}</span>
-                  </div>
-                )}
               </div>
-
-              <div className="flex items-center text-xs text-muted-foreground">
-                <span>View Details & History</span>
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
           ))}
         </div>

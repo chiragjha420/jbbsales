@@ -8,15 +8,11 @@ import { Product, Sale } from '@/types';
 import { formatINR, formatDate } from '@/lib/calculations';
 import {
   ArrowLeft,
-  Package,
   Edit,
-  Check,
-  AlertTriangle,
   Upload,
-  Receipt,
-  X,
   Star,
   Trash2,
+  X,
 } from 'lucide-react';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
@@ -35,6 +31,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [editMin, setEditMin] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Image Upload State
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -98,6 +98,73 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       alert('Network error while updating product.');
     } finally {
       setSavingEdit(false);
+    }
+  };
+
+  const handleAddPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+
+    setUploadingImage(true);
+    try {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        const dataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+
+        const res = await fetch(`/api/products/${params.id}/images`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: file.name,
+            dataUrl,
+            isPrimary: !product?.images || product.images.length === 0,
+          }),
+        });
+        const data = await res.json();
+        if (data.product) {
+          setProduct(data.product);
+        }
+      }
+    } catch {
+      alert('Error uploading photos.');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleDeletePhoto = async (imageId: string) => {
+    if (!window.confirm('Delete this product photo?')) return;
+    try {
+      const res = await fetch(`/api/products/${params.id}/images?imageId=${imageId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.product) {
+        setProduct(data.product);
+      }
+    } catch {
+      alert('Failed to delete photo.');
+    }
+  };
+
+  const handleSetPrimaryPhoto = async (imageId: string) => {
+    try {
+      const res = await fetch(`/api/products/${params.id}/images`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageId }),
+      });
+      const data = await res.json();
+      if (data.product) {
+        setProduct(data.product);
+      }
+    } catch {
+      alert('Failed to set primary photo.');
     }
   };
 
@@ -196,18 +263,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-border hover:bg-muted text-xs font-semibold rounded text-foreground transition-colors"
           >
             <Edit className="w-3.5 h-3.5" />
-            <span>{isEditing ? 'Cancel Edit' : 'Edit Economics'}</span>
+            <span>{isEditing ? 'Cancel' : 'Edit'}</span>
           </button>
         </div>
       </div>
 
-      {/* Edit Form (if editing) */}
+      {/* Edit Form */}
       {isEditing && (
         <div className="p-4 bg-surface border border-border rounded space-y-3 text-xs">
-          <div className="font-semibold text-foreground uppercase tracking-wide text-[11px]">
-            Edit Product Values
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
@@ -240,7 +303,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                Current Cost Price (₹)
+                Cost Price (₹)
               </label>
               <input
                 type="number"
@@ -250,9 +313,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 onChange={(e) => setEditCost(e.target.value)}
                 className="w-full p-2 bg-background border border-border rounded text-foreground font-bold focus:outline-none"
               />
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Note: Changing cost does NOT alter past sales
-              </span>
             </div>
 
             <div>
@@ -306,60 +366,94 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       {/* Economics Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Current Cost Price</div>
-          <div className="text-lg font-bold text-foreground mt-1">{formatINR(product.cost_price)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Base procurement cost</div>
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Cost Price</div>
+          <div className="text-base font-bold text-foreground mt-1">{formatINR(product.cost_price)}</div>
         </div>
 
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Recommended Price</div>
-          <div className="text-lg font-bold text-foreground mt-1">
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Recommended</div>
+          <div className="text-base font-bold text-foreground mt-1">
             {product.recommended_price ? formatINR(product.recommended_price) : '-'}
           </div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
-            {product.recommended_price
-              ? `Est. Margin: ${(((product.recommended_price - product.cost_price) / product.recommended_price) * 100).toFixed(0)}%`
-              : 'Open negotiation'}
+        </div>
+
+        <div className="p-3 bg-surface border border-border rounded">
+          <div className="text-[10px] text-muted-foreground uppercase font-medium">Minimum Floor</div>
+          <div className="text-base font-bold text-foreground mt-1">
+            {product.minimum_price ? formatINR(product.minimum_price) : 'No floor'}
           </div>
         </div>
 
-        <div className="p-3.5 bg-surface border border-border rounded">
-          <div className="text-[10px] text-muted-foreground uppercase font-medium">Floor / Minimum Price</div>
-          <div className="text-lg font-bold text-foreground mt-1">
-            {product.minimum_price ? formatINR(product.minimum_price) : 'No floor set'}
-          </div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Warning threshold</div>
-        </div>
-
-        <div className="p-3.5 bg-surface border border-border rounded">
+        <div className="p-3 bg-surface border border-border rounded">
           <div className="text-[10px] text-muted-foreground uppercase font-medium">Times Sold</div>
-          <div className="text-lg font-bold text-foreground mt-1">{salesWithProduct.length}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Historical order occurrences</div>
+          <div className="text-base font-bold text-foreground mt-1">{salesWithProduct.length}</div>
         </div>
       </div>
 
-      {/* Product Photos Gallery */}
+      {/* Product Photos Section with Explicit Add Photo Button */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-3">
-        <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-          Product Photo Catalog ({product.images?.length || 0})
+        <div className="flex items-center justify-between">
+          <div className="font-semibold text-xs text-foreground uppercase tracking-wider">
+            Photos ({product.images?.length || 0})
+          </div>
+
+          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover rounded text-xs font-semibold cursor-pointer transition-colors">
+            <Upload className="w-3.5 h-3.5" />
+            <span>{uploadingImage ? 'Uploading...' : 'Add Photos'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={uploadingImage}
+              onChange={handleAddPhotos}
+              className="hidden"
+            />
+          </label>
         </div>
 
         {(!product.images || product.images.length === 0) ? (
-          <div className="p-4 border border-dashed border-border rounded text-center text-xs text-muted-foreground">
-            No photos uploaded for this product.
+          <div className="p-6 border border-dashed border-border rounded text-center text-xs text-muted-foreground">
+            No photos yet. Click &quot;Add Photos&quot; above to upload picture(s).
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {product.images.map((img) => (
-              <div key={img.id} className="relative aspect-square border border-border rounded overflow-hidden group bg-muted">
+              <div
+                key={img.id}
+                className="relative aspect-square border border-border rounded overflow-hidden group bg-muted"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.storage_path} alt={img.file_name} className="w-full h-full object-cover" />
-                {img.is_primary && (
-                  <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
-                    Primary
+                <img
+                  src={img.storage_path}
+                  alt={img.file_name}
+                  onClick={() => setPreviewImage(img.storage_path)}
+                  className="w-full h-full object-cover cursor-pointer"
+                />
+
+                {img.is_primary ? (
+                  <span className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 fill-current" />
+                    <span>Primary</span>
                   </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleSetPrimaryPhoto(img.id)}
+                    className="absolute top-1.5 left-1.5 bg-background/90 text-foreground text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+                  >
+                    Set Primary
+                  </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => handleDeletePhoto(img.id)}
+                  className="absolute top-1.5 right-1.5 bg-background/90 hover:bg-danger text-foreground hover:text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Delete Photo"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
               </div>
             ))}
           </div>
@@ -368,8 +462,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       {/* Keywords */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-2">
-        <div className="font-semibold uppercase text-muted-foreground tracking-wide text-[11px]">
-          Configured Discovery Keywords
+        <div className="font-semibold text-xs text-foreground uppercase tracking-wider">
+          Keywords
         </div>
         <div className="flex flex-wrap gap-1.5">
           {product.keywords?.map((kw, i) => (
@@ -382,13 +476,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       {/* Actual Selling Price History for This Product */}
       <div className="space-y-3">
-        <div className="font-semibold text-sm text-foreground uppercase tracking-wide">
-          Actual Selling Price & Negotiation History
+        <div className="font-semibold text-xs text-foreground uppercase tracking-wider">
+          Selling Price History
         </div>
 
         {salesWithProduct.length === 0 ? (
-          <div className="p-6 border border-border rounded text-center bg-surface text-xs text-muted-foreground">
-            No sales have been logged for this product yet.
+          <div className="p-4 border border-border rounded text-center bg-surface text-xs text-muted-foreground">
+            No sales logged for this product yet.
           </div>
         ) : (
           <div className="border border-border rounded overflow-hidden divide-y divide-border bg-card text-xs">
@@ -403,21 +497,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                       </Link>
                     </div>
                     <div className="text-muted-foreground mt-0.5">
-                      Customer: <strong className="text-foreground">{s.customer_name_snapshot}</strong> · Rep: {s.salesperson?.full_name}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Sold on {formatDate(s.sale_date)} · Qty: {matchedItem?.quantity || 1}
+                      {s.customer_name_snapshot} · Rep: {s.salesperson?.full_name}
                     </div>
                   </div>
 
                   <div className="text-right">
                     <div className="font-bold text-foreground">
-                      Sold at: {formatINR(matchedItem?.selling_price || 0)}
+                      {formatINR(matchedItem?.selling_price || 0)}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Cost snapshot: <span className="font-mono">{formatINR(matchedItem?.cost_at_sale || 0)}</span>
-                    </div>
-                    <div className="text-xs font-semibold text-success">
+                    <div className="text-xs text-success font-medium">
                       Profit: {formatINR(matchedItem?.line_profit || 0)}
                     </div>
                   </div>
@@ -427,6 +515,29 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-3"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-2xl max-h-[90vh]">
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-10 right-0 p-1 text-white hover:text-danger"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewImage}
+              alt="Product Full View"
+              className="max-h-[85vh] max-w-full object-contain rounded"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

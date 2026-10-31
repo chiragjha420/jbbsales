@@ -1,42 +1,39 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import {
-  Settings,
   User,
-  Shield,
-  Smartphone,
-  Database,
+  Package,
+  PlusCircle,
   LogOut,
-  CheckCircle2,
+  Sun,
+  Moon,
+  Laptop,
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { user, isAdmin, logout, switchUser } = useAuth();
-  const { mode, resolvedTheme } = useTheme();
+  const { user, isAdmin, logout } = useAuth();
+  const { mode, setMode } = useTheme();
 
   return (
-    <div className="p-3.5 md:p-6 max-w-3xl mx-auto space-y-5 pb-24">
+    <div className="p-3.5 md:p-6 max-w-2xl mx-auto space-y-5 pb-24">
       <div className="pb-2 border-b border-border">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight">System Settings</h1>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          Application configuration, user role profile, and appearance preferences
-        </div>
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Settings</h1>
       </div>
 
-      {/* User Identity Profile */}
+      {/* User Profile */}
       <div className="p-4 bg-surface border border-border rounded space-y-3">
         <div className="flex items-center justify-between">
           <div className="font-semibold text-xs uppercase text-muted-foreground tracking-wide flex items-center gap-1.5">
             <User className="w-3.5 h-3.5" />
-            <span>Active Operator Profile</span>
+            <span>Profile</span>
           </div>
           {isAdmin ? (
             <span className="text-[10px] bg-foreground text-background font-mono px-2 py-0.5 rounded font-bold uppercase">
-              Administrator
+              Admin
             </span>
           ) : (
             <span className="text-[10px] bg-muted text-muted-foreground font-mono px-2 py-0.5 rounded font-bold uppercase">
@@ -45,13 +42,13 @@ export default function SettingsPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
           <div>
-            <span className="text-muted-foreground block text-[10px] uppercase">Full Name</span>
+            <span className="text-muted-foreground block text-[10px] uppercase">Name</span>
             <span className="font-bold text-sm text-foreground">{user?.full_name || 'Loading...'}</span>
           </div>
           <div>
-            <span className="text-muted-foreground block text-[10px] uppercase">Registered Email</span>
+            <span className="text-muted-foreground block text-[10px] uppercase">Email</span>
             <span className="font-semibold text-foreground">{user?.email || 'Loading...'}</span>
           </div>
           <div>
@@ -59,73 +56,84 @@ export default function SettingsPage() {
             <span className="font-medium text-foreground">{user?.phone || 'Not configured'}</span>
           </div>
           <div>
-            <span className="text-muted-foreground block text-[10px] uppercase">Status</span>
-            <span className="text-success font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Active</span>
-            </span>
+            <span className="text-muted-foreground block text-[10px] uppercase">Role</span>
+            <span className="font-medium text-foreground uppercase">{user?.role || 'Salesperson'}</span>
           </div>
-        </div>
-
-        {/* Switch Account */}
-        <div className="pt-3 border-t border-border">
-          <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1.5">
-            Switch Account for Verification
-          </label>
-          <select
-            value={user?.email || 'rahul@jbb.in'}
-            onChange={(e) => switchUser(e.target.value)}
-            className="w-full sm:w-auto text-xs p-2 bg-background border border-border rounded text-foreground focus:outline-none"
-          >
-            <option value="admin@jbb.in">Admin (JBB Management)</option>
-            <option value="rahul@jbb.in">Rahul Sharma (Salesperson)</option>
-            <option value="amit@jbb.in">Amit Verma (Salesperson)</option>
-            <option value="suresh@jbb.in">Suresh Patel (Salesperson)</option>
-          </select>
         </div>
       </div>
 
       {/* Appearance Settings */}
       <div className="p-4 bg-surface border border-border rounded space-y-3">
         <div className="font-semibold text-xs uppercase text-muted-foreground tracking-wide">
-          Display & Appearance
+          Appearance
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div>
-            <div className="font-medium text-foreground">Theme Mode</div>
-            <div className="text-muted-foreground text-[11px]">
-              Select White Light, True Black Dark, or Device OS preference
+        
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => setMode('light')}
+            className={`p-3 border rounded text-xs font-medium flex flex-col items-center justify-center gap-1.5 transition-colors ${
+              mode === 'light'
+                ? 'bg-foreground text-background border-foreground font-semibold'
+                : 'border-border text-foreground hover:bg-card'
+            }`}
+          >
+            <Sun className="w-4 h-4" />
+            <span>Light</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode('dark')}
+            className={`p-3 border rounded text-xs font-medium flex flex-col items-center justify-center gap-1.5 transition-colors ${
+              mode === 'dark'
+                ? 'bg-foreground text-background border-foreground font-semibold'
+                : 'border-border text-foreground hover:bg-card'
+            }`}
+          >
+            <Moon className="w-4 h-4" />
+            <span>Dark</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode('device')}
+            className={`p-3 border rounded text-xs font-medium flex flex-col items-center justify-center gap-1.5 transition-colors ${
+              mode === 'device'
+                ? 'bg-foreground text-background border-foreground font-semibold'
+                : 'border-border text-foreground hover:bg-card'
+            }`}
+          >
+            <Laptop className="w-4 h-4" />
+            <span>Device</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Navigation Shortcuts */}
+      <div className="p-4 bg-surface border border-border rounded space-y-2">
+        <div className="font-semibold text-xs uppercase text-muted-foreground tracking-wide">
+          Quick Access
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+          <Link
+            href="/products"
+            className="p-2.5 bg-background border border-border rounded hover:bg-card text-xs flex items-center justify-between transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium text-foreground">Product Catalog</span>
             </div>
-          </div>
-          <ThemeToggle />
-        </div>
-      </div>
-
-      {/* Database & Storage Status */}
-      <div className="p-4 bg-surface border border-border rounded space-y-2 text-xs">
-        <div className="font-semibold text-xs uppercase text-muted-foreground tracking-wide flex items-center gap-1.5">
-          <Database className="w-3.5 h-3.5" />
-          <span>Database & Storage Architecture</span>
-        </div>
-        <div className="text-muted-foreground space-y-1 text-[11px]">
-          <div>• Database Engine: <strong className="text-foreground">PostgreSQL / Supabase Schema</strong></div>
-          <div>• Payment Proof Storage: <strong className="text-foreground">Private Authenticated Bucket</strong></div>
-          <div>• Historical Integrity: <strong className="text-foreground">Snapshot Cost at Sale Time</strong></div>
-          <div>• Fallback Engine: <strong className="text-foreground">Persistent Atomic Transaction Store</strong></div>
-        </div>
-      </div>
-
-      {/* PWA & Mobile Installation */}
-      <div className="p-4 bg-surface border border-border rounded space-y-2 text-xs">
-        <div className="font-semibold text-xs uppercase text-muted-foreground tracking-wide flex items-center gap-1.5">
-          <Smartphone className="w-3.5 h-3.5" />
-          <span>Progressive Web App (PWA) on Android</span>
-        </div>
-        <div className="text-muted-foreground text-[11px] space-y-1">
-          <div>1. Open this portal in Chrome or Edge on your Android phone.</div>
-          <div>2. Tap the browser menu (three dots) in the upper-right corner.</div>
-          <div>3. Tap <strong className="text-foreground">&quot;Install app&quot;</strong> or <strong className="text-foreground">&quot;Add to Home screen&quot;</strong>.</div>
-          <div>4. JBB Sales will run full-screen as a standalone native-feeling business app.</div>
+          </Link>
+          <Link
+            href="/sales/new"
+            className="p-2.5 bg-background border border-border rounded hover:bg-card text-xs flex items-center justify-between transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <PlusCircle className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium text-foreground">Create New Sale</span>
+            </div>
+          </Link>
         </div>
       </div>
 
@@ -137,7 +145,7 @@ export default function SettingsPage() {
           className="w-full py-2.5 px-4 border border-danger/40 text-danger hover:bg-danger-surface font-semibold text-xs rounded transition-colors flex items-center justify-center gap-2"
         >
           <LogOut className="w-4 h-4" />
-          <span>Sign Out of JBB Sales</span>
+          <span>Sign Out</span>
         </button>
       </div>
     </div>
