@@ -23,7 +23,8 @@ import {
 import { createAdminClient } from '@/lib/supabase/admin';
 
 // Local storage directory for persistent fallback
-const DATA_DIR = path.join(process.cwd(), '.data');
+const IS_VERCEL = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = IS_VERCEL ? '/tmp' : path.join(process.cwd(), '.data');
 const STORE_FILE = path.join(DATA_DIR, 'jbb_sales_store.json');
 
 interface LocalDatabase {
@@ -44,55 +45,60 @@ const INITIAL_PROFILES: Profile[] = [];
 const INITIAL_PRODUCTS: Product[] = [];
 const INITIAL_CUSTOMERS: Customer[] = [];
 
-// Helper to ensure database file exists
-function ensureDb(): LocalDatabase {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+let memoryDb: LocalDatabase | null = null;
 
-  if (!fs.existsSync(STORE_FILE)) {
-    const initialDb: LocalDatabase = {
-      profiles: INITIAL_PROFILES,
-      products: INITIAL_PRODUCTS,
-      product_images: [],
-      customers: INITIAL_CUSTOMERS,
-      sales: [],
-      sale_items: [],
-      payments: [],
-      payment_proofs: [],
-      audit_logs: [],
-      sale_sequence: 1,
-    };
-    fs.writeFileSync(STORE_FILE, JSON.stringify(initialDb, null, 2), 'utf8');
-    return initialDb;
-  }
+// Helper to ensure database exists without crashing on read-only serverless filesystems
+function ensureDb(): LocalDatabase {
+  if (memoryDb) return memoryDb;
 
   try {
-    const raw = fs.readFileSync(STORE_FILE, 'utf8');
-    return JSON.parse(raw);
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (fs.existsSync(STORE_FILE)) {
+      const raw = fs.readFileSync(STORE_FILE, 'utf8');
+      memoryDb = JSON.parse(raw);
+      return memoryDb!;
+    }
   } catch {
-    const initialDb: LocalDatabase = {
-      profiles: INITIAL_PROFILES,
-      products: INITIAL_PRODUCTS,
-      product_images: [],
-      customers: INITIAL_CUSTOMERS,
-      sales: [],
-      sale_items: [],
-      payments: [],
-      payment_proofs: [],
-      audit_logs: [],
-      sale_sequence: 1,
-    };
-    fs.writeFileSync(STORE_FILE, JSON.stringify(initialDb, null, 2), 'utf8');
-    return initialDb;
+    // Read-only filesystem or temporary read issue
   }
+
+  memoryDb = {
+    profiles: INITIAL_PROFILES,
+    products: INITIAL_PRODUCTS,
+    product_images: [],
+    customers: INITIAL_CUSTOMERS,
+    sales: [],
+    sale_items: [],
+    payments: [],
+    payment_proofs: [],
+    audit_logs: [],
+    sale_sequence: 1,
+  };
+
+  try {
+    fs.writeFileSync(STORE_FILE, JSON.stringify(memoryDb, null, 2), 'utf8');
+  } catch {
+    // Non-fatal if filesystem is read-only
+  }
+
+  return memoryDb;
 }
 
-// Atomic save helper
+// Atomic save helper with serverless safety
 function saveDb(db: LocalDatabase): void {
-  const tempFile = `${STORE_FILE}.tmp.${Date.now()}`;
-  fs.writeFileSync(tempFile, JSON.stringify(db, null, 2), 'utf8');
-  fs.renameSync(tempFile, STORE_FILE);
+  memoryDb = db;
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    const tempFile = `${STORE_FILE}.tmp.${Date.now()}`;
+    fs.writeFileSync(tempFile, JSON.stringify(db, null, 2), 'utf8');
+    fs.renameSync(tempFile, STORE_FILE);
+  } catch {
+    // Non-fatal if filesystem is read-only
+  }
 }
 
 // Check if Supabase tables are ready
@@ -101,7 +107,11 @@ async function isSupabaseAvailable(): Promise<boolean> {
   if (supabaseReady !== null) return supabaseReady;
   try {
     const client = createAdminClient();
-    const { error } = await client.from('products').select('id').limit(1);
+    if (!client) {
+      supabaseReady = false;
+      return false;
+    }
+    const { error } = await client.from('profiles').select('id').limit(1);
     supabaseReady = !error;
     return supabaseReady;
   } catch {
@@ -115,26 +125,90 @@ export const repository = {
   // Profiles / Users
   // -------------------------------------------------------------------
   async getProfiles(): Promise<Profile[]> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .order('full_name', { ascending: true });
+        if (!error && data && data.length > 0) {
+          return data as Profile[];
+        }
+      } catch {}
+    }
     const db = ensureDb();
     return db.profiles.sort((a, b) => a.full_name.localeCompare(b.full_name));
   },
 
   async getProfileById(id: string): Promise<Profile | null> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        if (!error && data) {
+          return data as Profile;
+        }
+
+        // Check directly in Supabase Auth if profiles row was not yet created
+        const { data: authUser, error: authErr } = await client.auth.admin.getUserById(id);
+        if (!authErr && authUser?.user) {
+          const u = authUser.user;
+          const meta = u.user_metadata || {};
+          const emailPrefix = (u.email || '').split('@')[0];
+          const prof: Profile = {
+            id: u.id,
+            email: u.email || '',
+            full_name:
+              meta.full_name ||
+              meta.name ||
+              (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1)),
+            phone: meta.phone || null,
+            role:
+              meta.role === 'admin' || (u.email || '').toLowerCase().startsWith('admin')
+                ? 'admin'
+                : 'salesperson',
+            active: true,
+            created_at: u.created_at,
+            updated_at: u.updated_at || u.created_at,
+          };
+          try {
+            await client.from('profiles').upsert(prof, { onConflict: 'id' });
+          } catch {}
+          return prof;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
     return db.profiles.find((p) => p.id === id) || null;
   },
 
   async getProfileByEmail(email: string): Promise<Profile | null> {
+    const cleanEmail = email.toLowerCase().trim();
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .ilike('email', cleanEmail)
+          .maybeSingle();
+        if (!error && data) {
+          return data as Profile;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
-    return db.profiles.find((p) => p.email.toLowerCase() === email.toLowerCase()) || null;
+    return db.profiles.find((p) => p.email.toLowerCase() === cleanEmail) || null;
   },
 
   async createProfile(data: { email: string; full_name: string; phone?: string; role: UserRole }): Promise<Profile> {
-    const db = ensureDb();
-    const existing = db.profiles.find((p) => p.email.toLowerCase() === data.email.toLowerCase());
-    if (existing) {
-      throw new Error('A user with this email already exists.');
-    }
     const newProfile: Profile = {
       id: crypto.randomUUID(),
       email: data.email.toLowerCase().trim(),
@@ -145,6 +219,15 @@ export const repository = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
+
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client.from('profiles').insert(newProfile);
+      } catch {}
+    }
+
+    const db = ensureDb();
     db.profiles.push(newProfile);
     saveDb(db);
     return newProfile;
@@ -158,27 +241,8 @@ export const repository = {
     role: UserRole;
     active?: boolean;
   }): Promise<Profile> {
-    const db = ensureDb();
     const cleanEmail = data.email.toLowerCase().trim();
-    const existingIdx = db.profiles.findIndex(
-      (p) => (data.id && p.id === data.id) || p.email.toLowerCase() === cleanEmail
-    );
-
-    if (existingIdx !== -1) {
-      db.profiles[existingIdx] = {
-        ...db.profiles[existingIdx],
-        id: data.id || db.profiles[existingIdx].id,
-        email: cleanEmail,
-        full_name: data.full_name.trim() || db.profiles[existingIdx].full_name,
-        role: data.role || db.profiles[existingIdx].role,
-        active: data.active !== undefined ? data.active : db.profiles[existingIdx].active,
-        updated_at: new Date().toISOString(),
-      };
-      saveDb(db);
-      return db.profiles[existingIdx];
-    }
-
-    const newProfile: Profile = {
+    const profileRecord: Profile = {
       id: data.id || crypto.randomUUID(),
       email: cleanEmail,
       full_name: data.full_name.trim(),
@@ -188,29 +252,134 @@ export const repository = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    db.profiles.push(newProfile);
+
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data: upserted } = await client
+          .from('profiles')
+          .upsert(
+            {
+              id: profileRecord.id,
+              email: profileRecord.email,
+              full_name: profileRecord.full_name,
+              phone: profileRecord.phone,
+              role: profileRecord.role,
+              active: profileRecord.active,
+              updated_at: profileRecord.updated_at,
+            },
+            { onConflict: 'id' }
+          )
+          .select()
+          .maybeSingle();
+        if (upserted) {
+          profileRecord.id = upserted.id;
+        }
+      } catch {}
+    }
+
+    const db = ensureDb();
+    const existingIdx = db.profiles.findIndex(
+      (p) => (data.id && p.id === data.id) || p.email.toLowerCase() === cleanEmail
+    );
+
+    if (existingIdx !== -1) {
+      db.profiles[existingIdx] = {
+        ...db.profiles[existingIdx],
+        ...profileRecord,
+      };
+    } else {
+      db.profiles.push(profileRecord);
+    }
     saveDb(db);
-    return newProfile;
+    return profileRecord;
   },
 
   async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client
+          .from('profiles')
+          .update({
+            ...updates,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', id);
+      } catch {}
+    }
+
     const db = ensureDb();
     const idx = db.profiles.findIndex((p) => p.id === id);
-    if (idx === -1) throw new Error('User profile not found.');
+    if (idx !== -1) {
+      db.profiles[idx] = {
+        ...db.profiles[idx],
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+      saveDb(db);
+      return db.profiles[idx];
+    }
 
-    db.profiles[idx] = {
-      ...db.profiles[idx],
-      ...updates,
-      updated_at: new Date().toISOString(),
-    };
-    saveDb(db);
-    return db.profiles[idx];
+    return (await this.getProfileById(id)) || ({} as Profile);
   },
 
   // -------------------------------------------------------------------
   // Products
   // -------------------------------------------------------------------
   async getProducts(options?: { search?: string; category?: string; activeOnly?: boolean }): Promise<Product[]> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        let query = client
+          .from('products')
+          .select('*, product_images(*)')
+          .order('created_at', { ascending: false });
+
+        if (options?.activeOnly !== false) {
+          query = query.eq('active', true);
+        }
+        if (options?.category && options.category !== 'All') {
+          query = query.ilike('category', options.category);
+        }
+        const { data, error } = await query;
+        if (!error && data && data.length > 0) {
+          let list = data.map((p: any) => {
+            const imgs = p.product_images || [];
+            const primary = imgs.find((i: any) => i.is_primary) || imgs[0];
+            return {
+              id: p.id,
+              name: p.name,
+              sku: p.sku,
+              description: p.description,
+              cost_price: Number(p.cost_price),
+              recommended_price: p.recommended_price !== null ? Number(p.recommended_price) : null,
+              minimum_price: p.minimum_price !== null ? Number(p.minimum_price) : null,
+              category: p.category,
+              keywords: Array.isArray(p.keywords) ? p.keywords : [],
+              active: p.active,
+              created_by: p.created_by,
+              created_at: p.created_at,
+              updated_at: p.updated_at,
+              images: imgs,
+              primary_image_url: primary ? primary.storage_path : undefined,
+            } as Product;
+          });
+
+          if (options?.search) {
+            const q = options.search.toLowerCase().trim();
+            list = list.filter((p) =>
+              p.name.toLowerCase().includes(q) ||
+              p.sku.toLowerCase().includes(q) ||
+              p.description?.toLowerCase().includes(q) ||
+              p.keywords.some((k) => k.toLowerCase().includes(q))
+            );
+          }
+          return list;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
     let list = [...db.products];
 
@@ -246,6 +415,39 @@ export const repository = {
   },
 
   async getProductById(id: string): Promise<Product | null> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('products')
+          .select('*, product_images(*)')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!error && data) {
+          const imgs = data.product_images || [];
+          const primary = imgs.find((i: any) => i.is_primary) || imgs[0];
+          return {
+            id: data.id,
+            name: data.name,
+            sku: data.sku,
+            description: data.description,
+            cost_price: Number(data.cost_price),
+            recommended_price: data.recommended_price !== null ? Number(data.recommended_price) : null,
+            minimum_price: data.minimum_price !== null ? Number(data.minimum_price) : null,
+            category: data.category,
+            keywords: Array.isArray(data.keywords) ? data.keywords : [],
+            active: data.active,
+            created_by: data.created_by,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            images: imgs,
+            primary_image_url: primary ? primary.storage_path : undefined,
+          } as Product;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
     const prod = db.products.find((p) => p.id === id);
     if (!prod) return null;
@@ -296,6 +498,38 @@ export const repository = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
+
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client.from('products').insert({
+          id: newProduct.id,
+          name: newProduct.name,
+          sku: newProduct.sku,
+          description: newProduct.description,
+          cost_price: newProduct.cost_price,
+          recommended_price: newProduct.recommended_price,
+          minimum_price: newProduct.minimum_price,
+          category: newProduct.category,
+          keywords: newProduct.keywords,
+          active: newProduct.active,
+          created_by: newProduct.created_by,
+        });
+
+        if (data.images && data.images.length > 0) {
+          const imgRows = data.images.map((img, idx) => ({
+            id: crypto.randomUUID(),
+            product_id: newProduct.id,
+            storage_path: img.dataUrl,
+            file_name: img.fileName,
+            is_primary: img.isPrimary !== undefined ? img.isPrimary : idx === 0,
+          }));
+          await client.from('product_images').insert(imgRows);
+        }
+      } catch (err) {
+        console.warn('Supabase product insert error:', err);
+      }
+    }
 
     db.products.push(newProduct);
 
@@ -411,6 +645,34 @@ export const repository = {
   // Customers
   // -------------------------------------------------------------------
   async getCustomers(options?: { search?: string; salespersonId?: string }): Promise<Customer[]> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        let query = client
+          .from('customers')
+          .select('*, assigned_salesperson:profiles!customers_assigned_salesperson_id_fkey(id, full_name, email)')
+          .order('created_at', { ascending: false });
+
+        if (options?.salespersonId) {
+          query = query.eq('assigned_salesperson_id', options.salespersonId);
+        }
+        const { data, error } = await query;
+        if (!error && data && data.length > 0) {
+          let list = data as Customer[];
+          if (options?.search) {
+            const q = options.search.toLowerCase().trim();
+            list = list.filter((c) =>
+              c.name.toLowerCase().includes(q) ||
+              c.company?.toLowerCase().includes(q) ||
+              c.phone.includes(q) ||
+              c.contact_person?.toLowerCase().includes(q)
+            );
+          }
+          return list;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
     let list = [...db.customers];
 
@@ -439,6 +701,21 @@ export const repository = {
   },
 
   async getCustomerById(id: string): Promise<Customer | null> {
+    const client = createAdminClient();
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('customers')
+          .select('*, assigned_salesperson:profiles!customers_assigned_salesperson_id_fkey(id, full_name, email)')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!error && data) {
+          return data as Customer;
+        }
+      } catch {}
+    }
+
     const db = ensureDb();
     const c = db.customers.find((cust) => cust.id === id);
     if (!c) return null;
@@ -477,6 +754,27 @@ export const repository = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
+
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client.from('customers').insert({
+          id: newCustomer.id,
+          name: newCustomer.name,
+          company: newCustomer.company,
+          contact_person: newCustomer.contact_person,
+          phone: newCustomer.phone,
+          email: newCustomer.email,
+          address: newCustomer.address,
+          city: newCustomer.city,
+          notes: newCustomer.notes,
+          assigned_salesperson_id: newCustomer.assigned_salesperson_id,
+          created_by: newCustomer.created_by,
+        });
+      } catch (err) {
+        console.warn('Supabase customer insert error:', err);
+      }
+    }
 
     db.customers.push(newCustomer);
     saveDb(db);
@@ -636,6 +934,39 @@ export const repository = {
 
     db.sales.push(newSale);
     db.sale_items.push(...preparedItems);
+
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client.from('sales').insert({
+          id: newSale.id,
+          sale_number: newSale.sale_number,
+          salesperson_id: newSale.salesperson_id,
+          customer_id: newSale.customer_id,
+          customer_name_snapshot: newSale.customer_name_snapshot,
+          sale_date: newSale.sale_date,
+          courier_charge: newSale.courier_charge,
+          courier_cost: newSale.courier_cost,
+          other_charge: newSale.other_charge,
+          other_cost: newSale.other_cost,
+          product_revenue: newSale.product_revenue,
+          product_cost: newSale.product_cost,
+          total_revenue: newSale.total_revenue,
+          total_cost: newSale.total_cost,
+          gross_profit: newSale.gross_profit,
+          margin_percentage: newSale.gross_margin,
+          payment_status: newSale.payment_status,
+          notes: newSale.notes,
+          created_by: newSale.created_by,
+        });
+
+        if (preparedItems.length > 0) {
+          await client.from('sale_items').insert(preparedItems);
+        }
+      } catch (err) {
+        console.warn('Supabase sale insert error:', err);
+      }
+    }
 
     // If initial payment exists, record it and proofs
     if (data.initialPayment && data.initialPayment.amount > 0) {
