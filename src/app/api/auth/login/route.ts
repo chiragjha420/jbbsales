@@ -33,8 +33,9 @@ export async function POST(req: NextRequest) {
         // If not yet in local profiles store, automatically create and sync it
         if (!profile) {
           const emailPrefix = cleanEmail.split('@')[0];
-          const displayName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-          const role = cleanEmail.startsWith('admin') ? 'admin' : 'salesperson';
+          const userMeta = authData.user.user_metadata || {};
+          const displayName = userMeta.full_name || userMeta.name || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+          const role = userMeta.role === 'admin' || cleanEmail.startsWith('admin') ? 'admin' : 'salesperson';
 
           profile = await repository.createOrUpdateProfile({
             id: authData.user.id,

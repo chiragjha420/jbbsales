@@ -39,80 +39,8 @@ interface LocalDatabase {
   sale_sequence: number;
 }
 
-// Initial real team profiles synced from Supabase Auth
-const INITIAL_PROFILES: Profile[] = [
-  {
-    id: '3c74956b-81b7-4ce3-8b4c-2ee6f9c39820',
-    email: 'admin@jbb.com',
-    full_name: 'Admin',
-    phone: null,
-    role: 'admin',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '93174609-0f35-4ca8-a168-9f642a8237a6',
-    email: 'buntybhai@jbb.com',
-    full_name: 'Bunty Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '5d2c4198-1d71-456f-a647-807a5b6633e2',
-    email: 'deepakbhai@jbb.com',
-    full_name: 'Deepak Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '343cb0c9-96c0-4775-848c-091a00ddccc8',
-    email: 'lokeshbhai@jbb.com',
-    full_name: 'Lokesh Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '38756b11-1bd4-4112-999b-f688f3174a97',
-    email: 'ankitbhai@jbb.com',
-    full_name: 'Ankit Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'b75fcd7b-dc39-4560-bb0c-8edcefc959f7',
-    email: 'deepubhai@jbb.com',
-    full_name: 'Deepu Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '80dadfe3-0cfa-4e86-8871-91babeccfc98',
-    email: 'sanjubhai@jbb.com',
-    full_name: 'Sanju Bhai',
-    phone: null,
-    role: 'salesperson',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
+// Initial store structures start completely empty for clean production use
+const INITIAL_PROFILES: Profile[] = [];
 const INITIAL_PRODUCTS: Product[] = [];
 const INITIAL_CUSTOMERS: Customer[] = [];
 
