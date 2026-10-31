@@ -23,28 +23,43 @@ export async function POST(req: NextRequest) {
       });
 
       if (!authError && authData?.user) {
-        // Look up profile by Supabase user id
-        profile = await repository.getProfileById(authData.user.id);
-        if (!profile) {
-          // Look up by email
-          profile = await repository.getProfileByEmail(cleanEmail);
+        // 1. Check if profile exists directly in Supabase DB profiles table
+        let dbProfile: any = null;
+        try {
+          const { data: supabaseRow } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+          if (supabaseRow) {
+            dbProfile = supabaseRow;
+          }
+        } catch {
+          // Table may not yet be created or schema being setup
         }
 
-        // If not yet in local profiles store, automatically create and sync it
-        if (!profile) {
-          const emailPrefix = cleanEmail.split('@')[0];
-          const userMeta = authData.user.user_metadata || {};
-          const displayName = userMeta.full_name || userMeta.name || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
-          const role = userMeta.role === 'admin' || cleanEmail.startsWith('admin') ? 'admin' : 'salesperson';
+        // 2. Resolve display name and role from Supabase DB or Auth Metadata
+        const userMeta = authData.user.user_metadata || {};
+        const emailPrefix = cleanEmail.split('@')[0];
+        const displayName =
+          dbProfile?.full_name ||
+          userMeta.full_name ||
+          userMeta.name ||
+          (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
 
-          profile = await repository.createOrUpdateProfile({
-            id: authData.user.id,
-            email: cleanEmail,
-            full_name: displayName,
-            role: role as any,
-            active: true,
-          });
-        }
+        const role =
+          dbProfile?.role ||
+          userMeta.role ||
+          (cleanEmail.startsWith('admin') ? 'admin' : 'salesperson');
+
+        // Sync into application store
+        profile = await repository.createOrUpdateProfile({
+          id: authData.user.id,
+          email: cleanEmail,
+          full_name: displayName,
+          role: role as any,
+          active: dbProfile?.active !== undefined ? dbProfile.active : true,
+        });
       }
     } catch {
       // Supabase network / table setup fallback

@@ -24,6 +24,44 @@ create table if not exists public.profiles (
 create index if not exists idx_profiles_role on public.profiles(role);
 create index if not exists idx_profiles_active on public.profiles(active);
 
+-- Auto-create profile trigger when user is added via Supabase Auth
+create or replace function public.handle_new_user()
+returns trigger as $$
+declare
+  v_role text;
+  v_full_name text;
+begin
+  -- Role resolution: user_metadata first, then 'admin' prefix fallback, else 'salesperson'
+  v_role := coalesce(
+    new.raw_user_meta_data->>'role',
+    case when lower(new.email) like 'admin%' then 'admin' else 'salesperson' end
+  );
+  if v_role not in ('admin', 'salesperson') then
+    v_role := 'salesperson';
+  end if;
+
+  v_full_name := coalesce(
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'name',
+    initcap(split_part(new.email, '@', 1))
+  );
+
+  insert into public.profiles (id, email, full_name, role, active)
+  values (new.id, new.email, v_full_name, v_role, true)
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = coalesce(public.profiles.full_name, excluded.full_name),
+    role = coalesce(public.profiles.role, excluded.role);
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
 -- ---------------------------------------------------------------------
 -- 2. Products Table
 -- ---------------------------------------------------------------------
