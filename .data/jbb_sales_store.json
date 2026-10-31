@@ -1,0 +1,554 @@
+{
+  "profiles": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "email": "admin@jbb.in",
+      "full_name": "JBB Management",
+      "phone": "+91 98765 00001",
+      "role": "admin",
+      "active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "email": "rahul@jbb.in",
+      "full_name": "Rahul Sharma",
+      "phone": "+91 98765 11112",
+      "role": "salesperson",
+      "active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "email": "amit@jbb.in",
+      "full_name": "Amit Verma",
+      "phone": "+91 98765 22223",
+      "role": "salesperson",
+      "active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "email": "suresh@jbb.in",
+      "full_name": "Suresh Patel",
+      "phone": "+91 98765 33334",
+      "role": "salesperson",
+      "active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "a0000000-0000-0000-0000-000000000001",
+      "name": "Tournament Snooker Table 12ft English Slates",
+      "sku": "JBB-TBL-12FT-ENG",
+      "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
+      "cost_price": 210000,
+      "recommended_price": 240000,
+      "minimum_price": 220000,
+      "category": "Tables",
+      "keywords": [
+        "snooker",
+        "table",
+        "12ft",
+        "english",
+        "tournament",
+        "slates",
+        "cushions"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-10T00:00:00.000Z",
+      "updated_at": "2026-10-31T07:50:45.855Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000002",
+      "name": "Commercial Pool Table 8ft Italian Slate",
+      "sku": "JBB-TBL-8FT-POOL",
+      "description": "8ft commercial pool table with coin or ball-return option, sturdy hardwood frame",
+      "cost_price": 95000,
+      "recommended_price": 135000,
+      "minimum_price": 120000,
+      "category": "Tables",
+      "keywords": [
+        "pool",
+        "table",
+        "8ft",
+        "italian",
+        "slate",
+        "commercial",
+        "billiards"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-12T00:00:00.000Z",
+      "updated_at": "2026-01-12T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000003",
+      "name": "Handcrafted 3/4 Ash Wood Snooker Cue",
+      "sku": "JBB-CUE-34-ASH",
+      "description": "Premium 3/4 jointed ash wood cue with ebony butt and brass ferrule (9.5mm tip)",
+      "cost_price": 4200,
+      "recommended_price": 6800,
+      "minimum_price": 5800,
+      "category": "Cues",
+      "keywords": [
+        "cue",
+        "snooker",
+        "ash",
+        "3/4",
+        "joint",
+        "ebony",
+        "handcrafted"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-15T00:00:00.000Z",
+      "updated_at": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000004",
+      "name": "Professional Maple Pool Cue 58 inch",
+      "sku": "JBB-CUE-POOL-MAPLE",
+      "description": "13mm tip professional maple cue with Irish linen wrap and quick-release joint",
+      "cost_price": 3100,
+      "recommended_price": 5200,
+      "minimum_price": 4500,
+      "category": "Cues",
+      "keywords": [
+        "cue",
+        "pool",
+        "maple",
+        "billiards",
+        "linen",
+        "quick-release"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-18T00:00:00.000Z",
+      "updated_at": "2026-01-18T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000005",
+      "name": "Aramith Tournament Snooker Ball Set (2 1/16)",
+      "sku": "JBB-ACC-BALL-ARAMITH",
+      "description": "Genuine Belgian phenolic resin 1G tournament snooker ball set",
+      "cost_price": 14500,
+      "recommended_price": 21000,
+      "minimum_price": 18500,
+      "category": "Accessories",
+      "keywords": [
+        "balls",
+        "aramith",
+        "snooker",
+        "tournament",
+        "belgian",
+        "resin"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-20T00:00:00.000Z",
+      "updated_at": "2026-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000006",
+      "name": "Strachan 6811 Club Snooker Cloth 12ft",
+      "sku": "JBB-ACC-CLOTH-6811",
+      "description": "100% pure wool English snooker cloth, pre-cut bed and cushions",
+      "cost_price": 12000,
+      "recommended_price": 17500,
+      "minimum_price": 15500,
+      "category": "Accessories",
+      "keywords": [
+        "cloth",
+        "strachan",
+        "6811",
+        "snooker",
+        "wool",
+        "12ft",
+        "green"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-22T00:00:00.000Z",
+      "updated_at": "2026-01-22T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000007",
+      "name": "Taom V10 Snooker Chalk (Box of 9)",
+      "sku": "JBB-ACC-CHALK-TAOM",
+      "description": "Dust-free, clean cue ball impact premium finish chalk from Finland",
+      "cost_price": 2400,
+      "recommended_price": 3600,
+      "minimum_price": 3200,
+      "category": "Accessories",
+      "keywords": [
+        "chalk",
+        "taom",
+        "v10",
+        "green",
+        "dust-free",
+        "accessories"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-25T00:00:00.000Z",
+      "updated_at": "2026-01-25T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000008",
+      "name": "Professional 3-Finger Snooker Glove (Left Hand)",
+      "sku": "JBB-ACC-GLOVE-PRO",
+      "description": "Breathable spandex friction-free cue bridge glove",
+      "cost_price": 180,
+      "recommended_price": 350,
+      "minimum_price": 250,
+      "category": "Accessories",
+      "keywords": [
+        "glove",
+        "bridge",
+        "spandex",
+        "breathable",
+        "accessories"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-01-28T00:00:00.000Z",
+      "updated_at": "2026-01-28T00:00:00.000Z"
+    },
+    {
+      "id": "a0000000-0000-0000-0000-000000000009",
+      "name": "Multi-functional Cue Tip Shaper & Scuffer",
+      "sku": "JBB-ACC-TIP-SHAPER",
+      "description": "Aircraft aluminum pocket cue tip radius gauge, trimmer and aerator",
+      "cost_price": 110,
+      "recommended_price": 250,
+      "minimum_price": 180,
+      "category": "Accessories",
+      "keywords": [
+        "tip",
+        "shaper",
+        "scuffer",
+        "trimmer",
+        "aerator",
+        "accessories"
+      ],
+      "active": true,
+      "created_by": "00000000-0000-0000-0000-000000000001",
+      "created_at": "2026-02-01T00:00:00.000Z",
+      "updated_at": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "product_images": [],
+  "customers": [
+    {
+      "id": "c0000000-0000-0000-0000-000000000001",
+      "name": "Royal Palms Sports Club",
+      "company": "Royal Palms Hospitality Ltd",
+      "contact_person": "Vikram Singhania",
+      "phone": "+91 98200 45678",
+      "email": "sports@royalpalms.com",
+      "address": "Aarey Milk Colony, Goregaon East",
+      "city": "Mumbai",
+      "notes": "Premium snooker club with 6 tournament tables. Regular cloth and ball buyer.",
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000002",
+      "created_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-01-15T00:00:00.000Z",
+      "updated_at": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000002",
+      "name": "Apex Cue & Billiard Lounge",
+      "company": "Apex Entertainment LLP",
+      "contact_person": "Manish Rawat",
+      "phone": "+91 98110 99887",
+      "email": "manish@apexbilliards.in",
+      "address": "Sector 29 Market",
+      "city": "Gurugram",
+      "notes": "High footfall cue club. Often needs cues, tips and chalk in bulk.",
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000002",
+      "created_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-01-20T00:00:00.000Z",
+      "updated_at": "2026-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000003",
+      "name": "Golden Break Pool Cafe",
+      "company": "Golden Break Ventures",
+      "contact_person": "Karthik Reddy",
+      "phone": "+91 98480 33445",
+      "email": "karthik@goldenbreak.com",
+      "address": "Indiranagar 100ft Road",
+      "city": "Bengaluru",
+      "notes": "Purchasing 2 pool tables and accessories.",
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000003",
+      "created_by": "00000000-0000-0000-0000-000000000003",
+      "created_at": "2026-02-01T00:00:00.000Z",
+      "updated_at": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000004",
+      "name": "The Snooker Haven",
+      "company": "Haven Leisure Pvt Ltd",
+      "contact_person": "Deepak Chawla",
+      "phone": "+91 97120 77665",
+      "email": "deepak@snookerhaven.in",
+      "address": "C.G. Road",
+      "city": "Ahmedabad",
+      "notes": "Club upgrade planned for next quarter.",
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000004",
+      "created_by": "00000000-0000-0000-0000-000000000004",
+      "created_at": "2026-02-10T00:00:00.000Z",
+      "updated_at": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "0660e9ad-741e-4dd7-a212-5673a25c0ac1",
+      "name": "Grand Hyatt Snooker Club",
+      "company": "Hyatt Leisure Group",
+      "contact_person": null,
+      "phone": "+91 99887 76655",
+      "email": null,
+      "address": null,
+      "city": null,
+      "notes": null,
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000003",
+      "created_by": null,
+      "created_at": "2026-10-31T07:50:45.789Z",
+      "updated_at": "2026-10-31T07:50:45.915Z"
+    }
+  ],
+  "sales": [
+    {
+      "id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "sale_number": "JBB-2026-000001",
+      "salesperson_id": "00000000-0000-0000-0000-000000000002",
+      "customer_id": "0660e9ad-741e-4dd7-a212-5673a25c0ac1",
+      "customer_name_snapshot": "Grand Hyatt Snooker Club",
+      "sale_date": "2026-10-31T07:50:45.812Z",
+      "courier_charge": 3000,
+      "courier_cost": 2200,
+      "other_charge": 1500,
+      "other_cost": 1000,
+      "product_revenue": 242400,
+      "product_cost": 193400,
+      "total_revenue": 246900,
+      "total_cost": 196600,
+      "gross_profit": 50300,
+      "gross_margin": 20.37,
+      "payment_status": "paid",
+      "notes": "Initial test tournament delivery",
+      "created_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.812Z",
+      "updated_at": "2026-10-31T07:50:45.842Z"
+    }
+  ],
+  "sale_items": [
+    {
+      "id": "3b1b972c-2465-445c-a182-cc29c2e5bdc2",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "product_id": "a0000000-0000-0000-0000-000000000001",
+      "product_name_snapshot": "Tournament Snooker Table 12ft English Slates",
+      "sku_snapshot": "JBB-TBL-12FT-ENG",
+      "quantity": 1,
+      "selling_price": 230000,
+      "cost_at_sale": 185000,
+      "line_revenue": 230000,
+      "line_cost": 185000,
+      "line_profit": 45000,
+      "created_at": "2026-10-31T07:50:45.812Z"
+    },
+    {
+      "id": "e321604a-0f01-4eff-aa6c-3112c401cf7e",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "product_id": "a0000000-0000-0000-0000-000000000003",
+      "product_name_snapshot": "Handcrafted 3/4 Ash Wood Snooker Cue",
+      "sku_snapshot": "JBB-CUE-34-ASH",
+      "quantity": 2,
+      "selling_price": 6200,
+      "cost_at_sale": 4200,
+      "line_revenue": 12400,
+      "line_cost": 8400,
+      "line_profit": 4000,
+      "created_at": "2026-10-31T07:50:45.812Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "fda95787-1f23-484b-b6a6-fc53b222e410",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "amount": 100000,
+      "payment_method": "bank_transfer",
+      "payment_date": "2026-10-31T07:50:45.812Z",
+      "notes": "Advance UTR-829104829",
+      "recorded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.812Z"
+    },
+    {
+      "id": "aa3f77ad-8ada-465e-81de-5f0374a1380d",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "amount": 146900,
+      "payment_method": "upi",
+      "payment_date": "2026-10-31T07:50:45.842Z",
+      "notes": "Final balance settlement",
+      "recorded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.842Z"
+    }
+  ],
+  "payment_proofs": [
+    {
+      "id": "67238008-14e1-4751-9209-4c7fd3733f67",
+      "payment_id": "fda95787-1f23-484b-b6a6-fc53b222e410",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg==",
+      "file_name": "advance_payment_screenshot.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 45000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.812Z"
+    },
+    {
+      "id": "07476a23-a296-4c2b-a648-507032a17e69",
+      "payment_id": "fda95787-1f23-484b-b6a6-fc53b222e410",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg2==",
+      "file_name": "bank_stamp_receipt.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 52000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.828Z"
+    },
+    {
+      "id": "97656075-efc1-4b7b-a594-50e24a610330",
+      "payment_id": "aa3f77ad-8ada-465e-81de-5f0374a1380d",
+      "sale_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg3==",
+      "file_name": "upi_final_settlement.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 61000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T07:50:45.842Z"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "c7e97999-d6ba-460c-b770-5202e02bcbf2",
+      "entity_type": "sale",
+      "entity_id": "bcb110fa-e628-44a9-af16-7fb12354090a",
+      "action": "CREATE",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "saleNumber": "JBB-2026-000001",
+        "totalRevenue": 246900,
+        "grossProfit": 50300,
+        "itemCount": 2
+      },
+      "notes": "Created sale JBB-2026-000001",
+      "created_at": "2026-10-31T07:50:45.812Z"
+    },
+    {
+      "id": "0392f677-4c99-44f9-a7ce-9180868d28e2",
+      "entity_type": "payment_proof",
+      "entity_id": "07476a23-a296-4c2b-a648-507032a17e69",
+      "action": "ADD_PROOF",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "fileName": "bank_stamp_receipt.jpg"
+      },
+      "notes": "Uploaded additional payment proof for payment fda95787-1f23-484b-b6a6-fc53b222e410",
+      "created_at": "2026-10-31T07:50:45.828Z"
+    },
+    {
+      "id": "9d87d1a8-a8e8-4ce9-af11-91bb7d516d8d",
+      "entity_type": "payment",
+      "entity_id": "aa3f77ad-8ada-465e-81de-5f0374a1380d",
+      "action": "ADD_PAYMENT",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "amount": 146900,
+        "paymentMethod": "upi",
+        "proofCount": 1
+      },
+      "notes": "Recorded payment of ₹146900 for JBB-2026-000001",
+      "created_at": "2026-10-31T07:50:45.842Z"
+    },
+    {
+      "id": "5e1ca6b9-c96a-4516-9e62-12480fe81acd",
+      "entity_type": "product",
+      "entity_id": "a0000000-0000-0000-0000-000000000001",
+      "action": "UPDATE",
+      "performed_by": null,
+      "previous_state": {
+        "id": "a0000000-0000-0000-0000-000000000001",
+        "name": "Tournament Snooker Table 12ft English Slates",
+        "sku": "JBB-TBL-12FT-ENG",
+        "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
+        "cost_price": 185000,
+        "recommended_price": 240000,
+        "minimum_price": 220000,
+        "category": "Tables",
+        "keywords": [
+          "snooker",
+          "table",
+          "12ft",
+          "english",
+          "tournament",
+          "slates",
+          "cushions"
+        ],
+        "active": true,
+        "created_by": "00000000-0000-0000-0000-000000000001",
+        "created_at": "2026-01-10T00:00:00.000Z",
+        "updated_at": "2026-01-10T00:00:00.000Z"
+      },
+      "new_state": {
+        "id": "a0000000-0000-0000-0000-000000000001",
+        "name": "Tournament Snooker Table 12ft English Slates",
+        "sku": "JBB-TBL-12FT-ENG",
+        "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
+        "cost_price": 210000,
+        "recommended_price": 240000,
+        "minimum_price": 220000,
+        "category": "Tables",
+        "keywords": [
+          "snooker",
+          "table",
+          "12ft",
+          "english",
+          "tournament",
+          "slates",
+          "cushions"
+        ],
+        "active": true,
+        "created_by": "00000000-0000-0000-0000-000000000001",
+        "created_at": "2026-01-10T00:00:00.000Z",
+        "updated_at": "2026-10-31T07:50:45.855Z"
+      },
+      "notes": "Updated product Tournament Snooker Table 12ft English Slates",
+      "created_at": "2026-10-31T07:50:45.856Z"
+    },
+    {
+      "id": "6af434e0-0d37-4dc4-90e2-9138b2d4d8a9",
+      "entity_type": "customer",
+      "entity_id": "0660e9ad-741e-4dd7-a212-5673a25c0ac1",
+      "action": "REASSIGN",
+      "performed_by": "admin",
+      "previous_state": {
+        "assigned_salesperson_id": null
+      },
+      "new_state": {
+        "assigned_salesperson_id": "00000000-0000-0000-0000-000000000003"
+      },
+      "notes": "Reassigned customer Grand Hyatt Snooker Club",
+      "created_at": "2026-10-31T07:50:45.915Z"
+    }
+  ],
+  "sale_sequence": 2
+}
