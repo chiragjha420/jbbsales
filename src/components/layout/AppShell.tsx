@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
   Home,
@@ -23,12 +23,31 @@ import {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, isAdmin, logout } = useAuth();
+  const router = useRouter();
+  const { user, isAdmin, logout, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user && pathname !== '/login') {
+      router.push('/login');
+    }
+  }, [loading, user, pathname, router]);
 
   // If on login page, render plain without navigation shell
   if (pathname === '/login') {
     return <main className="min-h-screen bg-background text-foreground">{children}</main>;
+  }
+
+  // If loading authentication status or unauthenticated, display minimal spinner
+  if (loading || !user) {
+    return (
+      <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <div className="text-center space-y-2">
+          <div className="font-bold text-sm tracking-tight text-foreground">JBB SALES</div>
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </main>
+    );
   }
 
   const sidebarLinks = [

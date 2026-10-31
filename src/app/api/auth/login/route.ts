@@ -12,11 +12,9 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = String(email).trim().toLowerCase();
-
-    // 1. Attempt Supabase Auth signInWithPassword
-    let authenticatedUser: any = null;
     let profile = null;
 
+    // 1. Attempt Supabase Auth signInWithPassword
     try {
       const supabase = createClient();
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -25,14 +23,33 @@ export async function POST(req: NextRequest) {
       });
 
       if (!authError && authData?.user) {
-        authenticatedUser = authData.user;
+        // Look up profile by Supabase user id
         profile = await repository.getProfileById(authData.user.id);
+        if (!profile) {
+          // Look up by email
+          profile = await repository.getProfileByEmail(cleanEmail);
+        }
+
+        // If not yet in local profiles store, automatically create and sync it
+        if (!profile) {
+          const emailPrefix = cleanEmail.split('@')[0];
+          const displayName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+          const role = cleanEmail.startsWith('admin') ? 'admin' : 'salesperson';
+
+          profile = await repository.createOrUpdateProfile({
+            id: authData.user.id,
+            email: cleanEmail,
+            full_name: displayName,
+            role: role as any,
+            active: true,
+          });
+        }
       }
     } catch {
       // Supabase network / table setup fallback
     }
 
-    // 2. If profile not yet mapped in Supabase, lookup in repository
+    // 2. If Supabase auth was not used, fallback to repository profile
     if (!profile) {
       profile = await repository.getProfileByEmail(cleanEmail);
       if (!profile) {

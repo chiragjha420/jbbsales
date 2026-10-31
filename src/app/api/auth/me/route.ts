@@ -6,9 +6,7 @@ export async function GET(req: NextRequest) {
     const userId = req.cookies.get('jbb_user_id')?.value;
 
     if (!userId) {
-      // Default to Rahul for immediate seamless preview if not logged in
-      const defaultUser = await repository.getProfileByEmail('rahul@jbb.in');
-      return NextResponse.json({ user: defaultUser });
+      return NextResponse.json({ user: null }, { status: 401 });
     }
 
     const user = await repository.getProfileById(userId);

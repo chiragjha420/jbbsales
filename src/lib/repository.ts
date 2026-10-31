@@ -39,250 +39,82 @@ interface LocalDatabase {
   sale_sequence: number;
 }
 
-// Initial seed data to ensure instant, real, working system out of the box
+// Initial real team profiles synced from Supabase Auth
 const INITIAL_PROFILES: Profile[] = [
   {
-    id: '00000000-0000-0000-0000-000000000001',
-    email: 'admin@jbb.in',
-    full_name: 'JBB Management',
-    phone: '+91 98765 00001',
+    id: '3c74956b-81b7-4ce3-8b4c-2ee6f9c39820',
+    email: 'admin@jbb.com',
+    full_name: 'Admin',
+    phone: null,
     role: 'admin',
     active: true,
-    created_at: new Date('2026-01-01').toISOString(),
-    updated_at: new Date('2026-01-01').toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
-    id: '00000000-0000-0000-0000-000000000002',
-    email: 'rahul@jbb.in',
-    full_name: 'Rahul Sharma',
-    phone: '+91 98765 11112',
+    id: '93174609-0f35-4ca8-a168-9f642a8237a6',
+    email: 'buntybhai@jbb.com',
+    full_name: 'Bunty Bhai',
+    phone: null,
     role: 'salesperson',
     active: true,
-    created_at: new Date('2026-01-01').toISOString(),
-    updated_at: new Date('2026-01-01').toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
-    id: '00000000-0000-0000-0000-000000000003',
-    email: 'amit@jbb.in',
-    full_name: 'Amit Verma',
-    phone: '+91 98765 22223',
+    id: '5d2c4198-1d71-456f-a647-807a5b6633e2',
+    email: 'deepakbhai@jbb.com',
+    full_name: 'Deepak Bhai',
+    phone: null,
     role: 'salesperson',
     active: true,
-    created_at: new Date('2026-01-01').toISOString(),
-    updated_at: new Date('2026-01-01').toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
-    id: '00000000-0000-0000-0000-000000000004',
-    email: 'suresh@jbb.in',
-    full_name: 'Suresh Patel',
-    phone: '+91 98765 33334',
+    id: '343cb0c9-96c0-4775-848c-091a00ddccc8',
+    email: 'lokeshbhai@jbb.com',
+    full_name: 'Lokesh Bhai',
+    phone: null,
     role: 'salesperson',
     active: true,
-    created_at: new Date('2026-01-01').toISOString(),
-    updated_at: new Date('2026-01-01').toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '38756b11-1bd4-4112-999b-f688f3174a97',
+    email: 'ankitbhai@jbb.com',
+    full_name: 'Ankit Bhai',
+    phone: null,
+    role: 'salesperson',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'b75fcd7b-dc39-4560-bb0c-8edcefc959f7',
+    email: 'deepubhai@jbb.com',
+    full_name: 'Deepu Bhai',
+    phone: null,
+    role: 'salesperson',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '80dadfe3-0cfa-4e86-8871-91babeccfc98',
+    email: 'sanjubhai@jbb.com',
+    full_name: 'Sanju Bhai',
+    phone: null,
+    role: 'salesperson',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
 ];
 
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: 'a0000000-0000-0000-0000-000000000001',
-    name: 'Tournament Snooker Table 12ft English Slates',
-    sku: 'JBB-TBL-12FT-ENG',
-    description: 'Full tournament spec 12ft snooker table with Northern rubber cushions and English slates',
-    cost_price: 185000,
-    recommended_price: 240000,
-    minimum_price: 220000,
-    category: 'Tables',
-    keywords: ['snooker', 'table', '12ft', 'english', 'tournament', 'slates', 'cushions'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-10').toISOString(),
-    updated_at: new Date('2026-01-10').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000002',
-    name: 'Commercial Pool Table 8ft Italian Slate',
-    sku: 'JBB-TBL-8FT-POOL',
-    description: '8ft commercial pool table with coin or ball-return option, sturdy hardwood frame',
-    cost_price: 95000,
-    recommended_price: 135000,
-    minimum_price: 120000,
-    category: 'Tables',
-    keywords: ['pool', 'table', '8ft', 'italian', 'slate', 'commercial', 'billiards'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-12').toISOString(),
-    updated_at: new Date('2026-01-12').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000003',
-    name: 'Handcrafted 3/4 Ash Wood Snooker Cue',
-    sku: 'JBB-CUE-34-ASH',
-    description: 'Premium 3/4 jointed ash wood cue with ebony butt and brass ferrule (9.5mm tip)',
-    cost_price: 4200,
-    recommended_price: 6800,
-    minimum_price: 5800,
-    category: 'Cues',
-    keywords: ['cue', 'snooker', 'ash', '3/4', 'joint', 'ebony', 'handcrafted'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-15').toISOString(),
-    updated_at: new Date('2026-01-15').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000004',
-    name: 'Professional Maple Pool Cue 58 inch',
-    sku: 'JBB-CUE-POOL-MAPLE',
-    description: '13mm tip professional maple cue with Irish linen wrap and quick-release joint',
-    cost_price: 3100,
-    recommended_price: 5200,
-    minimum_price: 4500,
-    category: 'Cues',
-    keywords: ['cue', 'pool', 'maple', 'billiards', 'linen', 'quick-release'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-18').toISOString(),
-    updated_at: new Date('2026-01-18').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000005',
-    name: 'Aramith Tournament Snooker Ball Set (2 1/16)',
-    sku: 'JBB-ACC-BALL-ARAMITH',
-    description: 'Genuine Belgian phenolic resin 1G tournament snooker ball set',
-    cost_price: 14500,
-    recommended_price: 21000,
-    minimum_price: 18500,
-    category: 'Accessories',
-    keywords: ['balls', 'aramith', 'snooker', 'tournament', 'belgian', 'resin'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-20').toISOString(),
-    updated_at: new Date('2026-01-20').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000006',
-    name: 'Strachan 6811 Club Snooker Cloth 12ft',
-    sku: 'JBB-ACC-CLOTH-6811',
-    description: '100% pure wool English snooker cloth, pre-cut bed and cushions',
-    cost_price: 12000,
-    recommended_price: 17500,
-    minimum_price: 15500,
-    category: 'Accessories',
-    keywords: ['cloth', 'strachan', '6811', 'snooker', 'wool', '12ft', 'green'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-22').toISOString(),
-    updated_at: new Date('2026-01-22').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000007',
-    name: 'Taom V10 Snooker Chalk (Box of 9)',
-    sku: 'JBB-ACC-CHALK-TAOM',
-    description: 'Dust-free, clean cue ball impact premium finish chalk from Finland',
-    cost_price: 2400,
-    recommended_price: 3600,
-    minimum_price: 3200,
-    category: 'Accessories',
-    keywords: ['chalk', 'taom', 'v10', 'green', 'dust-free', 'accessories'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-25').toISOString(),
-    updated_at: new Date('2026-01-25').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000008',
-    name: 'Professional 3-Finger Snooker Glove (Left Hand)',
-    sku: 'JBB-ACC-GLOVE-PRO',
-    description: 'Breathable spandex friction-free cue bridge glove',
-    cost_price: 180,
-    recommended_price: 350,
-    minimum_price: 250,
-    category: 'Accessories',
-    keywords: ['glove', 'bridge', 'spandex', 'breathable', 'accessories'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-01-28').toISOString(),
-    updated_at: new Date('2026-01-28').toISOString(),
-  },
-  {
-    id: 'a0000000-0000-0000-0000-000000000009',
-    name: 'Multi-functional Cue Tip Shaper & Scuffer',
-    sku: 'JBB-ACC-TIP-SHAPER',
-    description: 'Aircraft aluminum pocket cue tip radius gauge, trimmer and aerator',
-    cost_price: 110,
-    recommended_price: 250,
-    minimum_price: 180,
-    category: 'Accessories',
-    keywords: ['tip', 'shaper', 'scuffer', 'trimmer', 'aerator', 'accessories'],
-    active: true,
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date('2026-02-01').toISOString(),
-    updated_at: new Date('2026-02-01').toISOString(),
-  },
-];
-
-const INITIAL_CUSTOMERS: Customer[] = [
-  {
-    id: 'c0000000-0000-0000-0000-000000000001',
-    name: 'Royal Palms Sports Club',
-    company: 'Royal Palms Hospitality Ltd',
-    contact_person: 'Vikram Singhania',
-    phone: '+91 98200 45678',
-    email: 'sports@royalpalms.com',
-    address: 'Aarey Milk Colony, Goregaon East',
-    city: 'Mumbai',
-    notes: 'Premium snooker club with 6 tournament tables. Regular cloth and ball buyer.',
-    assigned_salesperson_id: '00000000-0000-0000-0000-000000000002', // Rahul
-    created_by: '00000000-0000-0000-0000-000000000002',
-    created_at: new Date('2026-01-15').toISOString(),
-    updated_at: new Date('2026-01-15').toISOString(),
-  },
-  {
-    id: 'c0000000-0000-0000-0000-000000000002',
-    name: 'Apex Cue & Billiard Lounge',
-    company: 'Apex Entertainment LLP',
-    contact_person: 'Manish Rawat',
-    phone: '+91 98110 99887',
-    email: 'manish@apexbilliards.in',
-    address: 'Sector 29 Market',
-    city: 'Gurugram',
-    notes: 'High footfall cue club. Often needs cues, tips and chalk in bulk.',
-    assigned_salesperson_id: '00000000-0000-0000-0000-000000000002', // Rahul
-    created_by: '00000000-0000-0000-0000-000000000002',
-    created_at: new Date('2026-01-20').toISOString(),
-    updated_at: new Date('2026-01-20').toISOString(),
-  },
-  {
-    id: 'c0000000-0000-0000-0000-000000000003',
-    name: 'Golden Break Pool Cafe',
-    company: 'Golden Break Ventures',
-    contact_person: 'Karthik Reddy',
-    phone: '+91 98480 33445',
-    email: 'karthik@goldenbreak.com',
-    address: 'Indiranagar 100ft Road',
-    city: 'Bengaluru',
-    notes: 'Purchasing 2 pool tables and accessories.',
-    assigned_salesperson_id: '00000000-0000-0000-0000-000000000003', // Amit
-    created_by: '00000000-0000-0000-0000-000000000003',
-    created_at: new Date('2026-02-01').toISOString(),
-    updated_at: new Date('2026-02-01').toISOString(),
-  },
-  {
-    id: 'c0000000-0000-0000-0000-000000000004',
-    name: 'The Snooker Haven',
-    company: 'Haven Leisure Pvt Ltd',
-    contact_person: 'Deepak Chawla',
-    phone: '+91 97120 77665',
-    email: 'deepak@snookerhaven.in',
-    address: 'C.G. Road',
-    city: 'Ahmedabad',
-    notes: 'Club upgrade planned for next quarter.',
-    assigned_salesperson_id: '00000000-0000-0000-0000-000000000004', // Suresh
-    created_by: '00000000-0000-0000-0000-000000000004',
-    created_at: new Date('2026-02-10').toISOString(),
-    updated_at: new Date('2026-02-10').toISOString(),
-  },
-];
+const INITIAL_PRODUCTS: Product[] = [];
+const INITIAL_CUSTOMERS: Customer[] = [];
 
 // Helper to ensure database file exists
 function ensureDb(): LocalDatabase {
@@ -382,6 +214,49 @@ export const repository = {
       phone: data.phone?.trim() || null,
       role: data.role,
       active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    db.profiles.push(newProfile);
+    saveDb(db);
+    return newProfile;
+  },
+
+  async createOrUpdateProfile(data: {
+    id?: string;
+    email: string;
+    full_name: string;
+    phone?: string | null;
+    role: UserRole;
+    active?: boolean;
+  }): Promise<Profile> {
+    const db = ensureDb();
+    const cleanEmail = data.email.toLowerCase().trim();
+    const existingIdx = db.profiles.findIndex(
+      (p) => (data.id && p.id === data.id) || p.email.toLowerCase() === cleanEmail
+    );
+
+    if (existingIdx !== -1) {
+      db.profiles[existingIdx] = {
+        ...db.profiles[existingIdx],
+        id: data.id || db.profiles[existingIdx].id,
+        email: cleanEmail,
+        full_name: data.full_name.trim() || db.profiles[existingIdx].full_name,
+        role: data.role || db.profiles[existingIdx].role,
+        active: data.active !== undefined ? data.active : db.profiles[existingIdx].active,
+        updated_at: new Date().toISOString(),
+      };
+      saveDb(db);
+      return db.profiles[existingIdx];
+    }
+
+    const newProfile: Profile = {
+      id: data.id || crypto.randomUUID(),
+      email: cleanEmail,
+      full_name: data.full_name.trim(),
+      phone: data.phone || null,
+      role: data.role,
+      active: data.active !== undefined ? data.active : true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
