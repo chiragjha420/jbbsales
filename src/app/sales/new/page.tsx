@@ -350,11 +350,11 @@ export default function NewSalePage() {
         </div>
       )}
 
-      {/* 1. Customer Selection */}
+      {/* Customer Selection */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-2.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-muted-foreground uppercase">
-            1. Select Customer <span className="text-danger">*</span>
+            Customer <span className="text-danger">*</span>
           </label>
           <button
             type="button"
@@ -447,11 +447,11 @@ export default function NewSalePage() {
         )}
       </div>
 
-      {/* 2. Product Selection (Multi-Item Supported) */}
+      {/* Product Selection */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-muted-foreground uppercase">
-            2. Sale Items & Pricing <span className="text-danger">*</span>
+            Products <span className="text-danger">*</span>
           </label>
           <button
             type="button"
@@ -572,10 +572,10 @@ export default function NewSalePage() {
         )}
       </div>
 
-      {/* 3. Optional Courier & Other Charges (Separating Customer Charge vs Company Cost) */}
+      {/* Courier & Other Charges */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-3">
         <label className="text-xs font-semibold text-muted-foreground uppercase block">
-          3. Courier & Additional Charges (Optional)
+          Delivery & Charges
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -660,10 +660,10 @@ export default function NewSalePage() {
         </div>
       </div>
 
-      {/* 4. Live Financial Summary Box */}
+      {/* Live Financial Summary Box */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-2 text-xs">
         <div className="font-semibold text-muted-foreground uppercase tracking-wide">
-          4. Sale Profitability Breakdown
+          Profitability Breakdown
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
           <div className="p-2 bg-background border border-border rounded">
@@ -690,24 +690,42 @@ export default function NewSalePage() {
         </div>
       </div>
 
-      {/* 5. Payment & Payment Proof Screenshots */}
+      {/* Payment & Payment Proof Screenshots */}
       <div className="p-3.5 bg-surface border border-border rounded space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-muted-foreground uppercase">
-            5. Payment & Screenshot Evidence
+            Payment
           </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="hasPayment"
-              checked={hasPayment}
-              onChange={(e) => setHasPayment(e.target.checked)}
-              className="rounded border-border text-primary"
-            />
-            <label htmlFor="hasPayment" className="text-xs text-foreground cursor-pointer select-none">
-              Payment received now
-            </label>
-          </div>
+        </div>
+
+        {/* Clean Segmented Mode Selector */}
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-background border border-border rounded text-xs">
+          <button
+            type="button"
+            onClick={() => setHasPayment(true)}
+            className={`py-2 px-3 rounded font-semibold transition-colors text-center ${
+              hasPayment
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Payment Received
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setHasPayment(false);
+              setPaymentAmount('');
+              setProofFiles([]);
+            }}
+            className={`py-2 px-3 rounded font-semibold transition-colors text-center ${
+              !hasPayment
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Unpaid (Pay Later)
+          </button>
         </div>
 
         {hasPayment ? (
@@ -718,18 +736,21 @@ export default function NewSalePage() {
                   <label className="text-[10px] text-muted-foreground uppercase font-medium">
                     Amount Received (₹) <span className="text-danger">*</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={setFullPayment}
-                    className="text-[10px] text-muted-foreground hover:text-foreground underline"
-                  >
-                    Full Amount
-                  </button>
+                  {saleTotals.totalRevenue > 0 && (
+                    <button
+                      type="button"
+                      onClick={setFullPayment}
+                      className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                    >
+                      Full Amount ({formatINR(saleTotals.totalRevenue)})
+                    </button>
+                  )}
                 </div>
                 <input
                   type="number"
                   min="0"
-                  placeholder="0"
+                  step="0.01"
+                  placeholder="0.00"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                   className="w-full p-2 bg-background border border-border rounded font-semibold text-foreground focus:outline-none focus:border-foreground"
@@ -818,7 +839,7 @@ export default function NewSalePage() {
             </div>
           </div>
         ) : (
-          <div className="text-xs text-muted-foreground p-2 bg-background border border-border rounded">
+          <div className="text-xs text-muted-foreground p-2.5 bg-background border border-border rounded">
             This sale will be marked as <strong className="text-danger">Unpaid</strong>. Payment and screenshots can be recorded later.
           </div>
         )}
@@ -837,7 +858,7 @@ export default function NewSalePage() {
           ) : (
             <>
               <Check className="w-5 h-5" />
-              <span>Confirm & Record Sale ({formatINR(saleTotals.totalRevenue)})</span>
+              <span>Confirm & Record Sale</span>
             </>
           )}
         </button>

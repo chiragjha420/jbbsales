@@ -47,7 +47,7 @@
       "name": "Tournament Snooker Table 12ft English Slates",
       "sku": "JBB-TBL-12FT-ENG",
       "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
-      "cost_price": 235000,
+      "cost_price": 260000,
       "recommended_price": 240000,
       "minimum_price": 220000,
       "category": "Tables",
@@ -63,7 +63,7 @@
       "active": true,
       "created_by": "00000000-0000-0000-0000-000000000001",
       "created_at": "2026-01-10T00:00:00.000Z",
-      "updated_at": "2026-10-31T08:42:16.711Z"
+      "updated_at": "2026-10-31T09:04:20.655Z"
     },
     {
       "id": "a0000000-0000-0000-0000-000000000002",
@@ -365,6 +365,21 @@
       "created_by": null,
       "created_at": "2026-10-31T08:42:16.630Z",
       "updated_at": "2026-10-31T08:42:16.877Z"
+    },
+    {
+      "id": "1c99a888-4e8f-4f87-9f97-61b49b5c7eca",
+      "name": "Grand Hyatt Snooker Club",
+      "company": "Hyatt Leisure Group",
+      "contact_person": null,
+      "phone": "+91 99887 76655",
+      "email": null,
+      "address": null,
+      "city": null,
+      "notes": null,
+      "assigned_salesperson_id": "00000000-0000-0000-0000-000000000003",
+      "created_by": null,
+      "created_at": "2026-10-31T09:04:20.505Z",
+      "updated_at": "2026-10-31T09:04:20.761Z"
     }
   ],
   "sales": [
@@ -459,6 +474,29 @@
       "created_by": "00000000-0000-0000-0000-000000000002",
       "created_at": "2026-10-31T08:42:16.658Z",
       "updated_at": "2026-10-31T08:42:16.695Z"
+    },
+    {
+      "id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "sale_number": "JBB-2026-000005",
+      "salesperson_id": "00000000-0000-0000-0000-000000000002",
+      "customer_id": "1c99a888-4e8f-4f87-9f97-61b49b5c7eca",
+      "customer_name_snapshot": "Grand Hyatt Snooker Club",
+      "sale_date": "2026-10-31T09:04:20.567Z",
+      "courier_charge": 3000,
+      "courier_cost": 2200,
+      "other_charge": 1500,
+      "other_cost": 1000,
+      "product_revenue": 242400,
+      "product_cost": 243400,
+      "total_revenue": 246900,
+      "total_cost": 246600,
+      "gross_profit": 300,
+      "gross_margin": 0.12,
+      "payment_status": "paid",
+      "notes": "Initial test tournament delivery",
+      "created_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.567Z",
+      "updated_at": "2026-10-31T09:04:20.631Z"
     }
   ],
   "sale_items": [
@@ -573,6 +611,34 @@
       "line_cost": 8400,
       "line_profit": 4000,
       "created_at": "2026-10-31T08:42:16.658Z"
+    },
+    {
+      "id": "b9b41ad7-a7f1-4c72-b1f1-8abf3208ca37",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "product_id": "a0000000-0000-0000-0000-000000000001",
+      "product_name_snapshot": "Tournament Snooker Table 12ft English Slates",
+      "sku_snapshot": "JBB-TBL-12FT-ENG",
+      "quantity": 1,
+      "selling_price": 230000,
+      "cost_at_sale": 235000,
+      "line_revenue": 230000,
+      "line_cost": 235000,
+      "line_profit": -5000,
+      "created_at": "2026-10-31T09:04:20.566Z"
+    },
+    {
+      "id": "4286602a-f115-4e90-9147-dc887ee6c6e6",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "product_id": "a0000000-0000-0000-0000-000000000003",
+      "product_name_snapshot": "Handcrafted 3/4 Ash Wood Snooker Cue",
+      "sku_snapshot": "JBB-CUE-34-ASH",
+      "quantity": 2,
+      "selling_price": 6200,
+      "cost_at_sale": 4200,
+      "line_revenue": 12400,
+      "line_cost": 8400,
+      "line_profit": 4000,
+      "created_at": "2026-10-31T09:04:20.566Z"
     }
   ],
   "payments": [
@@ -645,6 +711,26 @@
       "notes": "Final balance settlement",
       "recorded_by": "00000000-0000-0000-0000-000000000002",
       "created_at": "2026-10-31T08:42:16.695Z"
+    },
+    {
+      "id": "2978feb6-9e80-41b1-b314-b5f80efd3919",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "amount": 100000,
+      "payment_method": "bank_transfer",
+      "payment_date": "2026-10-31T09:04:20.567Z",
+      "notes": "Advance UTR-829104829",
+      "recorded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.567Z"
+    },
+    {
+      "id": "b6f735da-2b69-4e68-9365-84a0ebb97b10",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "amount": 146900,
+      "payment_method": "upi",
+      "payment_date": "2026-10-31T09:04:20.631Z",
+      "notes": "Final balance settlement",
+      "recorded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.631Z"
     }
   ],
   "payment_proofs": [
@@ -757,6 +843,39 @@
       "file_size": 61000,
       "uploaded_by": "00000000-0000-0000-0000-000000000002",
       "created_at": "2026-10-31T08:42:16.695Z"
+    },
+    {
+      "id": "e0a3d005-1164-4747-b0cc-debcc001e91e",
+      "payment_id": "2978feb6-9e80-41b1-b314-b5f80efd3919",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg==",
+      "file_name": "advance_payment_screenshot.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 45000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.567Z"
+    },
+    {
+      "id": "cce48058-fe4e-4368-b32e-ee716893f23e",
+      "payment_id": "2978feb6-9e80-41b1-b314-b5f80efd3919",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg2==",
+      "file_name": "bank_stamp_receipt.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 52000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.601Z"
+    },
+    {
+      "id": "fac94fb1-448a-415e-bd03-18dc798257cb",
+      "payment_id": "b6f735da-2b69-4e68-9365-84a0ebb97b10",
+      "sale_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "storage_path": "data:image/jpeg;base64,/9j/4AAQSkZJRg3==",
+      "file_name": "upi_final_settlement.jpg",
+      "mime_type": "image/jpeg",
+      "file_size": 61000,
+      "uploaded_by": "00000000-0000-0000-0000-000000000002",
+      "created_at": "2026-10-31T09:04:20.631Z"
     }
   ],
   "audit_logs": [
@@ -1102,7 +1221,121 @@
       },
       "notes": "Reassigned customer Grand Hyatt Snooker Club",
       "created_at": "2026-10-31T08:42:16.877Z"
+    },
+    {
+      "id": "2287f08d-0d56-42df-a34c-df4c0cc5c271",
+      "entity_type": "sale",
+      "entity_id": "9be2b14f-c408-4255-920f-4d5b03580a78",
+      "action": "CREATE",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "saleNumber": "JBB-2026-000005",
+        "totalRevenue": 246900,
+        "grossProfit": 300,
+        "itemCount": 2
+      },
+      "notes": "Created sale JBB-2026-000005",
+      "created_at": "2026-10-31T09:04:20.567Z"
+    },
+    {
+      "id": "6466fa30-2e6f-4994-ba72-4e1139ad8f25",
+      "entity_type": "payment_proof",
+      "entity_id": "cce48058-fe4e-4368-b32e-ee716893f23e",
+      "action": "ADD_PROOF",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "fileName": "bank_stamp_receipt.jpg"
+      },
+      "notes": "Uploaded additional payment proof for payment 2978feb6-9e80-41b1-b314-b5f80efd3919",
+      "created_at": "2026-10-31T09:04:20.602Z"
+    },
+    {
+      "id": "8fcf6b62-4e4b-423d-b96d-dd210394609c",
+      "entity_type": "payment",
+      "entity_id": "b6f735da-2b69-4e68-9365-84a0ebb97b10",
+      "action": "ADD_PAYMENT",
+      "performed_by": "00000000-0000-0000-0000-000000000002",
+      "previous_state": null,
+      "new_state": {
+        "amount": 146900,
+        "paymentMethod": "upi",
+        "proofCount": 1
+      },
+      "notes": "Recorded payment of ₹146900 for JBB-2026-000005",
+      "created_at": "2026-10-31T09:04:20.631Z"
+    },
+    {
+      "id": "f37e8e65-b209-48ba-8465-b86f2c5092ba",
+      "entity_type": "product",
+      "entity_id": "a0000000-0000-0000-0000-000000000001",
+      "action": "UPDATE",
+      "performed_by": null,
+      "previous_state": {
+        "id": "a0000000-0000-0000-0000-000000000001",
+        "name": "Tournament Snooker Table 12ft English Slates",
+        "sku": "JBB-TBL-12FT-ENG",
+        "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
+        "cost_price": 235000,
+        "recommended_price": 240000,
+        "minimum_price": 220000,
+        "category": "Tables",
+        "keywords": [
+          "snooker",
+          "table",
+          "12ft",
+          "english",
+          "tournament",
+          "slates",
+          "cushions"
+        ],
+        "active": true,
+        "created_by": "00000000-0000-0000-0000-000000000001",
+        "created_at": "2026-01-10T00:00:00.000Z",
+        "updated_at": "2026-10-31T08:42:16.711Z"
+      },
+      "new_state": {
+        "id": "a0000000-0000-0000-0000-000000000001",
+        "name": "Tournament Snooker Table 12ft English Slates",
+        "sku": "JBB-TBL-12FT-ENG",
+        "description": "Full tournament spec 12ft snooker table with Northern rubber cushions and English slates",
+        "cost_price": 260000,
+        "recommended_price": 240000,
+        "minimum_price": 220000,
+        "category": "Tables",
+        "keywords": [
+          "snooker",
+          "table",
+          "12ft",
+          "english",
+          "tournament",
+          "slates",
+          "cushions"
+        ],
+        "active": true,
+        "created_by": "00000000-0000-0000-0000-000000000001",
+        "created_at": "2026-01-10T00:00:00.000Z",
+        "updated_at": "2026-10-31T09:04:20.655Z"
+      },
+      "notes": "Updated product Tournament Snooker Table 12ft English Slates",
+      "created_at": "2026-10-31T09:04:20.655Z"
+    },
+    {
+      "id": "11feb5e1-67cb-4583-bc64-a7b4deb83769",
+      "entity_type": "customer",
+      "entity_id": "1c99a888-4e8f-4f87-9f97-61b49b5c7eca",
+      "action": "REASSIGN",
+      "performed_by": "admin",
+      "previous_state": {
+        "assigned_salesperson_id": null
+      },
+      "new_state": {
+        "assigned_salesperson_id": "00000000-0000-0000-0000-000000000003"
+      },
+      "notes": "Reassigned customer Grand Hyatt Snooker Club",
+      "created_at": "2026-10-31T09:04:20.761Z"
     }
   ],
-  "sale_sequence": 5
+  "sale_sequence": 6
 }
