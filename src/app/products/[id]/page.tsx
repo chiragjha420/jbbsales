@@ -30,6 +30,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [editRec, setEditRec] = useState('');
   const [editMin, setEditMin] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [applyToPastUncostedSales, setApplyToPastUncostedSales] = useState(true);
   const [savingEdit, setSavingEdit] = useState(false);
 
   // Image Upload State
@@ -68,8 +69,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   };
 
   const handleSaveEdit = async () => {
-    if (!editName.trim() || isNaN(parseFloat(editCost))) {
-      alert('Valid product name and cost are required.');
+    const numericCost = editCost.trim() !== '' ? parseFloat(editCost) : 0;
+    if (!editName.trim() || isNaN(numericCost) || numericCost < 0) {
+      alert('Valid product name is required.');
       return;
     }
 
@@ -80,10 +82,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: editName.trim(),
-          cost_price: parseFloat(editCost),
+          cost_price: numericCost,
           recommended_price: editRec ? parseFloat(editRec) : null,
           minimum_price: editMin ? parseFloat(editMin) : null,
           category: editCategory,
+          applyToPastUncostedSales,
         }),
       });
 
@@ -344,6 +347,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
+          {parseFloat(editCost || '0') > 0 && (
+            <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer pt-1">
+              <input
+                type="checkbox"
+                checked={applyToPastUncostedSales}
+                onChange={(e) => setApplyToPastUncostedSales(e.target.checked)}
+                className="w-4 h-4 accent-primary rounded"
+              />
+              <span>
+                Apply this cost to past sales where cost was not set (recalculates profit automatically)
+              </span>
+            </label>
+          )}
+
           <div className="flex justify-end gap-2 pt-2 border-t border-border">
             <button
               type="button"
@@ -368,7 +385,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div className="p-3 bg-surface border border-border rounded">
           <div className="text-[10px] text-muted-foreground uppercase font-medium">Cost Price</div>
-          <div className="text-base font-bold text-foreground mt-1">{formatINR(product.cost_price)}</div>
+          <div className="text-base font-bold text-foreground mt-1">
+            {product.cost_price > 0 ? (
+              formatINR(product.cost_price)
+            ) : (
+              <span className="text-muted-foreground font-semibold text-xs">Cost Pending</span>
+            )}
+          </div>
         </div>
 
         <div className="p-3 bg-surface border border-border rounded">

@@ -154,7 +154,9 @@ export default function ProductsPage() {
               <div className="mt-4 pt-3 border-t border-border/60 space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-muted-foreground">Unit Cost:</span>
-                  <span className="font-bold text-foreground">{formatINR(product.cost_price)}</span>
+                  <span className="font-bold text-foreground">
+                    {product.cost_price > 0 ? formatINR(product.cost_price) : 'Cost Pending'}
+                  </span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">

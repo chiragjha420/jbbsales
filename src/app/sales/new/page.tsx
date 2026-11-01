@@ -156,13 +156,13 @@ export default function NewSalePage() {
 
   // Add product to sale
   const handleSelectProduct = (prod: Product) => {
-    const defaultPrice = prod.recommended_price || prod.cost_price;
+    const defaultPrice = prod.recommended_price || prod.cost_price || 0;
     const newItem: SelectedItem = {
       tempId: crypto.randomUUID(),
       productId: prod.id,
       productName: prod.name,
       sku: prod.sku,
-      costPrice: prod.cost_price,
+      costPrice: prod.cost_price || 0,
       recommendedPrice: prod.recommended_price,
       minimumPrice: prod.minimum_price,
       quantity: 1,
@@ -486,7 +486,10 @@ export default function NewSalePage() {
                     <div>
                       <div className="font-semibold text-sm text-foreground">{item.productName}</div>
                       <div className="text-[11px] text-muted-foreground font-mono">
-                        SKU: {item.sku} · Unit Cost: <strong className="text-foreground">{formatINR(item.costPrice)}</strong>
+                        SKU: {item.sku} · Unit Cost:{' '}
+                        <strong className="text-foreground">
+                          {item.costPrice > 0 ? formatINR(item.costPrice) : 'Cost Pending'}
+                        </strong>
                         {item.recommendedPrice && ` · Rec: ${formatINR(item.recommendedPrice)}`}
                       </div>
                     </div>

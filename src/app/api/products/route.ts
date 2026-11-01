@@ -29,11 +29,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product name is required.' }, { status: 400 });
     }
 
-    if (body.cost_price === undefined || body.cost_price === null || isNaN(Number(body.cost_price))) {
-      return NextResponse.json({ error: 'Valid cost price is required.' }, { status: 400 });
-    }
+    const costPrice =
+      body.cost_price !== undefined && body.cost_price !== null && body.cost_price !== ''
+        ? Number(body.cost_price)
+        : 0;
 
-    if (Number(body.cost_price) < 0) {
+    if (isNaN(costPrice) || costPrice < 0) {
       return NextResponse.json({ error: 'Cost price cannot be negative.' }, { status: 400 });
     }
 
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       name: body.name,
       sku: body.sku,
       description: body.description,
-      cost_price: Number(body.cost_price),
+      cost_price: costPrice,
       recommended_price: body.recommended_price ? Number(body.recommended_price) : undefined,
       minimum_price: body.minimum_price ? Number(body.minimum_price) : undefined,
       category: body.category || 'General',

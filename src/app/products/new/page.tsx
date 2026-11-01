@@ -87,9 +87,9 @@ export default function NewProductPage() {
       return;
     }
 
-    const numericCost = parseFloat(costPrice);
+    const numericCost = costPrice.trim() !== '' ? parseFloat(costPrice) : 0;
     if (isNaN(numericCost) || numericCost < 0) {
-      setError('A valid cost price (₹) is required.');
+      setError('Cost price cannot be negative.');
       return;
     }
 
@@ -223,14 +223,13 @@ export default function NewProductPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase font-medium block mb-1">
-                Cost Price (Company Cost) <span className="text-danger">*</span>
+                Cost Price (Optional - add later)
               </label>
               <input
                 type="number"
-                required
                 min="0"
                 step="0.01"
-                placeholder="₹ 0.00"
+                placeholder="₹ 0.00 (Pending)"
                 value={costPrice}
                 onChange={(e) => setCostPrice(e.target.value)}
                 className="w-full p-2 bg-background border border-border rounded text-foreground font-bold focus:outline-none focus:border-foreground"

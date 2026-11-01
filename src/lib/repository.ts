@@ -552,7 +552,7 @@ export const repository = {
     return (await this.getProductById(newProduct.id))!;
   },
 
-  async updateProduct(id: string, updates: Partial<Product>, performedBy?: string): Promise<Product> {
+  async updateProduct(id: string, updates: Partial<Product> & { applyToPastUncostedSales?: boolean }, performedBy?: string): Promise<Product> {
     const db = ensureDb();
     const idx = db.products.findIndex((p) => p.id === id);
     if (idx === -1) throw new Error('Product not found.');
@@ -566,14 +566,100 @@ export const repository = {
       }
     }
 
+    const newCost = updates.cost_price !== undefined ? round2(updates.cost_price) : oldProduct.cost_price;
+
     db.products[idx] = {
       ...oldProduct,
       ...updates,
-      cost_price: updates.cost_price !== undefined ? round2(updates.cost_price) : oldProduct.cost_price,
+      cost_price: newCost,
       recommended_price: updates.recommended_price !== undefined ? (updates.recommended_price !== null ? round2(updates.recommended_price) : null) : oldProduct.recommended_price,
       minimum_price: updates.minimum_price !== undefined ? (updates.minimum_price !== null ? round2(updates.minimum_price) : null) : oldProduct.minimum_price,
       updated_at: new Date().toISOString(),
     };
+
+    // If requested, backfill cost to past sales where cost was 0/unset
+    if (updates.applyToPastUncostedSales && newCost > 0) {
+      const affectedSaleIds = new Set<string>();
+
+      db.sale_items.forEach((item) => {
+        if (item.product_id === id && (!item.cost_at_sale || item.cost_at_sale === 0)) {
+          item.cost_at_sale = newCost;
+          item.line_cost = round2(item.quantity * newCost);
+          item.line_profit = round2(item.line_revenue - item.line_cost);
+          affectedSaleIds.add(item.sale_id);
+        }
+      });
+
+      db.sales.forEach((sale) => {
+        if (affectedSaleIds.has(sale.id)) {
+          const saleItems = db.sale_items.filter((si) => si.sale_id === sale.id);
+          const totals = calculateSaleTotals({
+            items: saleItems.map((si) => ({
+              quantity: si.quantity,
+              sellingPrice: si.selling_price,
+              costAtSale: si.cost_at_sale,
+            })),
+            courierCharge: sale.courier_charge,
+            courierCost: sale.courier_cost,
+            otherCharge: sale.other_charge,
+            otherCost: sale.other_cost,
+          });
+
+          sale.product_cost = totals.productCost;
+          sale.total_cost = totals.totalCost;
+          sale.gross_profit = totals.grossProfit;
+          sale.gross_margin = totals.grossMargin;
+          sale.updated_at = new Date().toISOString();
+        }
+      });
+    }
+
+    // Supabase sync
+    const client = createAdminClient();
+    if (client) {
+      try {
+        await client
+          .from('products')
+          .update({
+            name: db.products[idx].name,
+            sku: db.products[idx].sku,
+            description: db.products[idx].description,
+            cost_price: db.products[idx].cost_price,
+            recommended_price: db.products[idx].recommended_price,
+            minimum_price: db.products[idx].minimum_price,
+            category: db.products[idx].category,
+            active: db.products[idx].active,
+            updated_at: db.products[idx].updated_at,
+          })
+          .eq('id', id);
+
+        if (updates.applyToPastUncostedSales && newCost > 0) {
+          const { data: remoteItems } = await client
+            .from('sale_items')
+            .select('id, quantity, selling_price, total_amount, sale_id')
+            .eq('product_id', id)
+            .or('cost_price_at_sale.eq.0,cost_price_at_sale.is.null');
+
+          if (remoteItems && remoteItems.length > 0) {
+            for (const rItem of remoteItems) {
+              const lineCost = round2(rItem.quantity * newCost);
+              const lineRevenue = rItem.total_amount || round2(rItem.quantity * rItem.selling_price);
+              const lineProfit = round2(lineRevenue - lineCost);
+              await client
+                .from('sale_items')
+                .update({
+                  cost_price_at_sale: newCost,
+                  total_cost: lineCost,
+                  profit: lineProfit,
+                })
+                .eq('id', rItem.id);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase product update error:', err);
+      }
+    }
 
     // Audit log
     db.audit_logs.push({
@@ -584,7 +670,7 @@ export const repository = {
       performed_by: performedBy || null,
       previous_state: oldProduct,
       new_state: db.products[idx],
-      notes: `Updated product ${oldProduct.name}`,
+      notes: `Updated product ${oldProduct.name}${updates.applyToPastUncostedSales ? ' with cost backfill' : ''}`,
       created_at: new Date().toISOString(),
     });
 
